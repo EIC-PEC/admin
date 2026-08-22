@@ -30,7 +30,11 @@ export default function SubscribersPage() {
       const data = await api.getSubscribers();
       setSubscribers(data || []);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not load subscribers.');
+      if (err instanceof ApiError && err.status === 404) {
+        setSubscribers([]);
+      } else {
+        setError(err instanceof ApiError ? err.message : 'Could not load subscribers.');
+      }
     } finally {
       setRefreshing(false);
       setLoading(false);

@@ -66,7 +66,13 @@ export default function AuditLogsPage() {
       setTotalPages(res.totalPages || 1);
       setPage(targetPage);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not load security audit logs.');
+      if (err instanceof ApiError && err.status === 404) {
+        setLogs([]);
+        setTotal(0);
+        setTotalPages(1);
+      } else {
+        setError(err instanceof ApiError ? err.message : 'Could not load security audit logs.');
+      }
     } finally {
       setRefreshing(false);
       setLoading(false);

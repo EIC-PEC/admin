@@ -482,3 +482,9 @@ export interface AuditLogItem {
   createdAt: string;
 }
 
+export interface SubscriberItem {
+  id: string;
+  email: string;
+  createdAt: string;
+}
+
