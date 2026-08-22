@@ -8,71 +8,17 @@ import {
   Share2, 
   Save, 
   RefreshCw, 
-  ExternalLink,
-  Clock,
-  MapPin,
-  CheckCircle2,
-  AlertTriangle,
-  Flame,
-  Info,
-  Ticket,
+  CheckCircle2, 
+  AlertTriangle 
 } from 'lucide-react';
 import { AppShell } from '../../components/layout/AppShell';
 import { api, ApiError } from '../../lib/api';
-import { SiteConfig } from '../../lib/types';
+import { AnnouncementsTab, PRESET_ANNOUNCEMENTS } from '../../components/config/AnnouncementsTab';
+import { DatesVenueTab } from '../../components/config/DatesVenueTab';
+import { HeroStatsTab } from '../../components/config/HeroStatsTab';
+import { ContactsTab } from '../../components/config/ContactsTab';
 
 type ConfigTab = 'ANNOUNCEMENTS' | 'DATES' | 'HERO' | 'CONTACTS';
-
-const PRESET_ANNOUNCEMENTS = [
-  {
-    label: 'Closing Tonight',
-    badge: 'URGENT',
-    text: 'Early Bird Student Passes closing at midnight! Limited slots remaining.',
-    link: '/register',
-  },
-  {
-    label: 'Price Hike Notice',
-    badge: 'PRICE HIKE',
-    text: 'Pass prices will increase by ₹100 starting tomorrow. Grab your tickets now!',
-    link: '/register',
-  },
-  {
-    label: 'Speakers Announcement',
-    badge: 'LINEUP',
-    text: 'Distinguished unicorn founders & startup investors joining PEC E-Summit 2026!',
-    link: '/#speakers',
-  },
-  {
-    label: 'Hackathon Registration',
-    badge: 'BUILDERS',
-    text: '24-Hour Hackathon registrations are now open. Prize pool worth ₹5,00,000.',
-    link: '/register',
-  },
-];
-
-function generateTwoDayDisplayString(startDateIso: string): string {
-  if (!startDateIso) return '';
-  const d1 = new Date(startDateIso);
-  if (isNaN(d1.getTime())) return '';
-
-  const d2 = new Date(d1.getTime() + 24 * 60 * 60 * 1000);
-
-  const m1 = d1.toLocaleString('en-US', { month: 'long' }).toUpperCase();
-  const day1 = d1.getDate();
-  const y1 = d1.getFullYear();
-
-  const m2 = d2.toLocaleString('en-US', { month: 'long' }).toUpperCase();
-  const day2 = d2.getDate();
-  const y2 = d2.getFullYear();
-
-  if (y1 !== y2) {
-    return `${m1} ${day1}, ${y1} – ${m2} ${day2}, ${y2}`;
-  }
-  if (m1 !== m2) {
-    return `${m1} ${day1} – ${m2} ${day2}, ${y1}`;
-  }
-  return `${m1} ${day1}–${day2}, ${y1}`;
-}
 
 export default function SiteConfigPage() {
   const [activeTab, setActiveTab] = useState<ConfigTab>('ANNOUNCEMENTS');
@@ -83,18 +29,22 @@ export default function SiteConfigPage() {
 
   // Form State
   const [heroTitle, setHeroTitle] = useState('WHERE IDEAS MEET CAPITAL & BUILD THE FUTURE');
-  const [heroSubtitle, setHeroSubtitle] = useState("North India's largest student entrepreneurship summit at Punjab Engineering College. Join 3,000+ founders, investors, and builders for 2 days of keynotes, high-stakes pitches, and hackathons.");
+  const [heroSubtitle, setHeroSubtitle] = useState(
+    "North India's largest student entrepreneurship summit at Punjab Engineering College. Join 3,000+ founders, investors, and builders for 2 days of keynotes, high-stakes pitches, and hackathons."
+  );
   const [summitDates, setSummitDates] = useState('MARCH 15–16, 2026');
   const [summitVenue, setSummitVenue] = useState('Punjab Engineering College, Sector 12, Chandigarh');
   const [heroVideoUrl, setHeroVideoUrl] = useState('');
   
   // Announcement State
   const [announcementEnabled, setAnnouncementEnabled] = useState(true);
-  const [announcementText, setAnnouncementText] = useState('Early Bird Student Passes closing at midnight! Limited slots remaining.');
+  const [announcementText, setAnnouncementText] = useState(
+    'Early Bird Student Passes closing at midnight! Limited slots remaining.'
+  );
   const [announcementLink, setAnnouncementLink] = useState('/register');
   const [announcementBadge, setAnnouncementBadge] = useState('URGENT');
 
-  // Countdown & Event Dates
+  // Countdown Target
   const [countdownTarget, setCountdownTarget] = useState('2026-03-15T09:00:00');
   const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; seconds: number }>({
     days: 0,
@@ -233,7 +183,7 @@ export default function SiteConfigPage() {
   return (
     <AppShell>
       <div className="space-y-6">
-        {/* Single Clean Page Header */}
+        {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-(--border-subtle) pb-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-(--text-primary)">
@@ -248,561 +198,124 @@ export default function SiteConfigPage() {
             <button
               onClick={loadConfig}
               disabled={loading || saving}
-              className="flex items-center gap-1.5 rounded-lg border border-(--border-panel) bg-(--bg-panel-alt) px-3 py-1.5 text-xs text-(--text-secondary) hover:bg-(--bg-panel-elevated) hover:text-(--text-primary) transition-colors disabled:opacity-50 font-semibold"
+              className="px-3 py-1.5 rounded-lg border border-(--border-panel) bg-(--bg-panel-alt) hover:bg-(--bg-panel) text-xs font-semibold text-(--text-primary) flex items-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>Sync</span>
+              <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+              <span>Reset</span>
             </button>
 
             <button
               onClick={handleSave}
-              disabled={saving}
-              className="flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-4 py-1.5 text-xs font-bold text-slate-950 shadow-sm transition-all uppercase tracking-wider disabled:opacity-50"
+              disabled={loading || saving}
+              className="px-4 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm cursor-pointer"
             >
-              {saving ? (
-                <>
-                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                  <span>Saving...</span>
-                </>
-              ) : savedSuccess ? (
-                <>
-                  <CheckCircle2 className="h-3.5 w-3.5 text-slate-950" />
-                  <span>Saved!</span>
-                </>
-              ) : (
-                <>
-                  <Save className="h-3.5 w-3.5" />
-                  <span>Publish Config</span>
-                </>
-              )}
+              <Save size={13} />
+              <span>{saving ? 'Saving...' : 'Publish Changes'}</span>
             </button>
           </div>
         </div>
 
-        {/* Error / Success Banners */}
-        {error && (
-          <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs text-rose-500 font-medium">
-            {error}
-          </div>
-        )}
-
+        {/* Feedback Alerts */}
         {savedSuccess && (
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4" />
-            <span>Site configuration and announcements successfully synced to public website!</span>
+          <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-medium flex items-center gap-2">
+            <CheckCircle2 size={14} className="shrink-0" />
+            <span>Site configuration updated and published successfully to live cache!</span>
           </div>
         )}
 
-        {/* Segmented Navigation Tabs */}
-        <div className="flex rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-1 gap-1 max-w-full overflow-x-auto w-full sm:w-fit">
-          <button
-            onClick={() => setActiveTab('ANNOUNCEMENTS')}
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
-              activeTab === 'ANNOUNCEMENTS'
-                ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                : 'text-(--text-secondary) hover:text-(--text-primary)'
-            }`}
-          >
-            <Megaphone className="h-3.5 w-3.5 shrink-0" />
-            <span>Announcements &amp; Ticker</span>
-          </button>
+        {error && (
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-medium flex items-center gap-2">
+            <AlertTriangle size={14} className="shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
-          <button
-            onClick={() => setActiveTab('DATES')}
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
-              activeTab === 'DATES'
-                ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                : 'text-(--text-secondary) hover:text-(--text-primary)'
-            }`}
-          >
-            <Calendar className="h-3.5 w-3.5 shrink-0" />
-            <span>Countdown &amp; Dates</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('HERO')}
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
-              activeTab === 'HERO'
-                ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                : 'text-(--text-secondary) hover:text-(--text-primary)'
-            }`}
-          >
-            <Sparkles className="h-3.5 w-3.5 shrink-0" />
-            <span>Hero &amp; Branding</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('CONTACTS')}
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
-              activeTab === 'CONTACTS'
-                ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                : 'text-(--text-secondary) hover:text-(--text-primary)'
-            }`}
-          >
-            <Share2 className="h-3.5 w-3.5 shrink-0" />
-            <span>Contacts &amp; Socials</span>
-          </button>
+        {/* Tabs Bar */}
+        <div className="flex items-center gap-1 border-b border-(--border-subtle) pb-px overflow-x-auto">
+          {[
+            { id: 'ANNOUNCEMENTS', label: 'Announcement Ticker', icon: Megaphone },
+            { id: 'DATES', label: 'Dates & Venue', icon: Calendar },
+            { id: 'HERO', label: 'Hero & Counters', icon: Sparkles },
+            { id: 'CONTACTS', label: 'Contacts & Socials', icon: Share2 },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as ConfigTab)}
+                className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 cursor-pointer ${
+                  isActive
+                    ? 'border-emerald-500 text-emerald-500 bg-emerald-500/5'
+                    : 'border-transparent text-(--text-muted) hover:text-(--text-primary) hover:border-(--border-subtle)'
+                }`}
+              >
+                <Icon size={14} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* ── TAB 1: ANNOUNCEMENTS & TICKER ── */}
+        {/* Active Tab Panel */}
         {activeTab === 'ANNOUNCEMENTS' && (
-          <div className="space-y-6">
-            {/* Live Interactive Preview Box */}
-            <div className="rounded-2xl border border-(--border-panel) bg-(--bg-panel) p-4 sm:p-5 space-y-3 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-(--text-primary) uppercase tracking-wider">
-                  Live Public Banner Preview
-                </span>
-                <span className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full border ${
-                  announcementEnabled 
-                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' 
-                    : 'bg-white/5 border-white/10 text-(--text-muted)'
-                }`}>
-                  {announcementEnabled ? 'BANNER ACTIVE' : 'BANNER HIDDEN'}
-                </span>
-              </div>
-
-              {/* Banner Simulation */}
-              <div className="rounded-xl overflow-hidden border border-emerald-500/30 bg-[#0F172A] p-3.5 shadow-inner">
-                {announcementEnabled ? (
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-3 text-left">
-                    <div className="flex items-start sm:items-center gap-2 text-xs flex-1 min-w-0">
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-500 text-slate-950 text-[10px] font-bold font-mono shrink-0">
-                        {announcementBadge}
-                      </span>
-                      <span className="text-emerald-100 font-medium break-words">{announcementText}</span>
-                    </div>
-
-                    {announcementLink && (
-                      <a
-                        href={announcementLink}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 px-3 py-1 text-xs text-emerald-300 font-semibold transition-colors shrink-0 self-end sm:self-auto"
-                      >
-                        <span>Take Action</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    )}
-                  </div>
-                ) : (
-                  <div className="py-2 text-center text-xs text-zinc-400 font-medium">
-                    (Announcement Banner is currently disabled and hidden from attendees)
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Editor Card */}
-            <div className="rounded-2xl border border-(--border-panel) bg-(--bg-panel) p-5 space-y-5 shadow-sm">
-              <div className="flex items-center justify-between border-b border-(--border-subtle) pb-3">
-                <h3 className="text-sm font-bold text-(--text-primary)">
-                  Announcement Controls
-                </h3>
-
-                {/* Banner Visibility Switch */}
-                <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <span className="text-xs font-semibold text-(--text-secondary)">
-                    Display Banner on Public Site
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={announcementEnabled}
-                    onChange={(e) => setAnnouncementEnabled(e.target.checked)}
-                    className="h-4 w-4 rounded accent-emerald-500 cursor-pointer"
-                  />
-                </label>
-              </div>
-
-              {/* Quick Template Presets */}
-              <div className="space-y-1.5">
-                <span className="text-[11px] text-(--text-muted) font-semibold uppercase tracking-wider block">
-                  Quick Broadcast Presets
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {PRESET_ANNOUNCEMENTS.map((preset) => (
-                    <button
-                      key={preset.label}
-                      type="button"
-                      onClick={() => applyPreset(preset)}
-                      className="px-3 py-1 rounded-lg border border-(--border-subtle) bg-(--bg-panel-alt) hover:border-emerald-500/40 hover:bg-(--bg-panel-elevated) text-xs text-(--text-secondary) font-medium transition-all flex items-center gap-1.5"
-                    >
-                      <Flame className="h-3 w-3 text-emerald-500" />
-                      <span>{preset.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Inputs */}
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                    Announcement Headline / Copy *
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={announcementText}
-                    onChange={(e) => setAnnouncementText(e.target.value)}
-                    placeholder="Enter urgent notification or ticket release announcement..."
-                    className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-3 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                      Action Link / Route URL
-                    </label>
-                    <input
-                      type="text"
-                      value={announcementLink}
-                      onChange={(e) => setAnnouncementLink(e.target.value)}
-                      placeholder="/register or https://..."
-                      className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                      Badge Tag Text
-                    </label>
-                    <input
-                      type="text"
-                      value={announcementBadge}
-                      onChange={(e) => setAnnouncementBadge(e.target.value)}
-                      placeholder="URGENT, PRICE HIKE, NOTICE"
-                      className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none font-mono"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <AnnouncementsTab
+            announcementEnabled={announcementEnabled}
+            setAnnouncementEnabled={setAnnouncementEnabled}
+            announcementText={announcementText}
+            setAnnouncementText={setAnnouncementText}
+            announcementLink={announcementLink}
+            setAnnouncementLink={setAnnouncementLink}
+            announcementBadge={announcementBadge}
+            setAnnouncementBadge={setAnnouncementBadge}
+            applyPreset={applyPreset}
+          />
         )}
 
-        {/* ── TAB 2: COUNTDOWN & DATES ── */}
         {activeTab === 'DATES' && (
-          <div className="space-y-6">
-            {/* Live Countdown Simulation Card */}
-            <div className="rounded-2xl border border-(--border-panel) bg-(--bg-panel) p-6 space-y-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-(--text-primary) uppercase tracking-wider">
-                  Live Countdown Clock Preview
-                </span>
-                <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
-                  T-MINUS TO SUMMIT
-                </span>
-              </div>
-
-              <div className="grid grid-cols-4 gap-3 text-center">
-                <div className="rounded-xl border border-(--border-subtle) bg-(--bg-panel-alt) p-4">
-                  <span className="text-2xl lg:text-3xl font-extrabold text-(--text-primary) font-mono block">
-                    {String(timeLeft.days).padStart(2, '0')}
-                  </span>
-                  <span className="text-[10px] uppercase tracking-wider text-(--text-muted) font-semibold">
-                    Days
-                  </span>
-                </div>
-
-                <div className="rounded-xl border border-(--border-subtle) bg-(--bg-panel-alt) p-4">
-                  <span className="text-2xl lg:text-3xl font-extrabold text-(--text-primary) font-mono block">
-                    {String(timeLeft.hours).padStart(2, '0')}
-                  </span>
-                  <span className="text-[10px] uppercase tracking-wider text-(--text-muted) font-semibold">
-                    Hours
-                  </span>
-                </div>
-
-                <div className="rounded-xl border border-(--border-subtle) bg-(--bg-panel-alt) p-4">
-                  <span className="text-2xl lg:text-3xl font-extrabold text-(--text-primary) font-mono block">
-                    {String(timeLeft.minutes).padStart(2, '0')}
-                  </span>
-                  <span className="text-[10px] uppercase tracking-wider text-(--text-muted) font-semibold">
-                    Mins
-                  </span>
-                </div>
-
-                <div className="rounded-xl border border-(--border-subtle) bg-(--bg-panel-alt) p-4">
-                  <span className="text-2xl lg:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono block">
-                    {String(timeLeft.seconds).padStart(2, '0')}
-                  </span>
-                  <span className="text-[10px] uppercase tracking-wider text-(--text-muted) font-semibold">
-                    Secs
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Date Configuration Fields */}
-            <div className="rounded-2xl border border-(--border-panel) bg-(--bg-panel) p-5 space-y-4 shadow-sm">
-              <h3 className="text-sm font-bold text-(--text-primary) border-b border-(--border-subtle) pb-3">
-                Summit Schedule &amp; Target Timings
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                    Event Start Date &amp; Time (Day 1) *
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={countdownTarget.slice(0, 16)}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setCountdownTarget(val);
-                      const auto = generateTwoDayDisplayString(val);
-                      if (auto) {
-                        setSummitDates(auto);
-                      }
-                    }}
-                    className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none font-mono"
-                  />
-                  <span className="text-[10px] text-(--text-muted) mt-1 block">
-                    Summit start timestamp. Automatically generates Day 1 &amp; Day 2 (+1 day).
-                  </span>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-semibold text-(--text-primary)">
-                      Display Dates String (2-Day Range) *
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const auto = generateTwoDayDisplayString(countdownTarget);
-                        if (auto) setSummitDates(auto);
-                      }}
-                      className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
-                    >
-                      Re-calculate (+1 Day)
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    value={summitDates}
-                    onChange={(e) => setSummitDates(e.target.value)}
-                    placeholder="e.g. SEPTEMBER 20–21, 2026"
-                    className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none font-bold font-mono"
-                  />
-                  <span className="text-[10px] text-(--text-muted) mt-1 block">
-                    Public text shown on passes, navbar, and hero.
-                  </span>
-                </div>
-
-                {/* 2-Day Info Banner */}
-                <div className="sm:col-span-2 rounded-xl bg-emerald-500/6 border border-emerald-500/20 p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                      2-Day Official Summit Schedule:
-                    </span>
-                    <span className="text-(--text-primary) font-mono font-bold">
-                      {summitDates || 'MARCH 15–16, 2026'}
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-(--text-muted)">
-                    Day 1 (Start) &rarr; Day 2 (+24 Hours)
-                  </span>
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                    Primary Campus Venue *
-                  </label>
-                  <input
-                    type="text"
-                    value={summitVenue}
-                    onChange={(e) => setSummitVenue(e.target.value)}
-                    placeholder="Punjab Engineering College, Sector 12, Chandigarh"
-                    className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <DatesVenueTab
+            summitDates={summitDates}
+            setSummitDates={setSummitDates}
+            summitVenue={summitVenue}
+            setSummitVenue={setSummitVenue}
+            countdownTarget={countdownTarget}
+            setCountdownTarget={setCountdownTarget}
+            timeLeft={timeLeft}
+          />
         )}
 
-        {/* ── TAB 3: HERO & BRANDING ── */}
         {activeTab === 'HERO' && (
-          <div className="rounded-2xl border border-(--border-panel) bg-(--bg-panel) p-5 space-y-4 shadow-sm">
-            <h3 className="text-sm font-bold text-(--text-primary) border-b border-(--border-subtle) pb-3">
-              Hero Section &amp; Public Statistics
-            </h3>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                  Hero Main Headline *
-                </label>
-                <input
-                  type="text"
-                  value={heroTitle}
-                  onChange={(e) => setHeroTitle(e.target.value)}
-                  placeholder="PEC E-SUMMIT 2026"
-                  className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none font-bold"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                  Hero Tagline / Subtitle *
-                </label>
-                <input
-                  type="text"
-                  value={heroSubtitle}
-                  onChange={(e) => setHeroSubtitle(e.target.value)}
-                  placeholder="IGNITING ENTREPRENEURSHIP & INNOVATION"
-                  className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                  Hero Teaser Video URL (YouTube / MP4)
-                </label>
-                <input
-                  type="url"
-                  value={heroVideoUrl}
-                  onChange={(e) => setHeroVideoUrl(e.target.value)}
-                  placeholder="https://youtube.com/watch?v=..."
-                  className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none"
-                />
-              </div>
-
-              {/* Numerical stats grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div>
-                  <label className="block text-[11px] font-semibold text-(--text-muted) mb-1">
-                    Expected Delegates
-                  </label>
-                  <input
-                    type="text"
-                    value={statsAttendees}
-                    onChange={(e) => setStatsAttendees(e.target.value)}
-                    placeholder="3000+"
-                    className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2 text-xs text-(--text-primary) font-bold text-center"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-(--text-muted) mb-1">
-                    Keynote Speakers
-                  </label>
-                  <input
-                    type="text"
-                    value={statsSpeakers}
-                    onChange={(e) => setStatsSpeakers(e.target.value)}
-                    placeholder="40+"
-                    className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2 text-xs text-(--text-primary) font-bold text-center"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-(--text-muted) mb-1">
-                    Prize Pool
-                  </label>
-                  <input
-                    type="text"
-                    value={statsPrizePool}
-                    onChange={(e) => setStatsPrizePool(e.target.value)}
-                    placeholder="₹15L+"
-                    className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2 text-xs text-(--text-primary) font-bold text-center"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-(--text-muted) mb-1">
-                    Summit Edition
-                  </label>
-                  <input
-                    type="text"
-                    value={statsEditions}
-                    onChange={(e) => setStatsEditions(e.target.value)}
-                    placeholder="7th"
-                    className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2 text-xs text-(--text-primary) font-bold text-center"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <HeroStatsTab
+            heroTitle={heroTitle}
+            setHeroTitle={setHeroTitle}
+            heroSubtitle={heroSubtitle}
+            setHeroSubtitle={setHeroSubtitle}
+            heroVideoUrl={heroVideoUrl}
+            setHeroVideoUrl={setHeroVideoUrl}
+            statsAttendees={statsAttendees}
+            setStatsAttendees={setStatsAttendees}
+            statsSpeakers={statsSpeakers}
+            setStatsSpeakers={setStatsSpeakers}
+            statsPrizePool={statsPrizePool}
+            setStatsPrizePool={setStatsPrizePool}
+            statsEditions={statsEditions}
+            setStatsEditions={setStatsEditions}
+          />
         )}
 
-        {/* ── TAB 4: CONTACTS & SOCIALS ── */}
         {activeTab === 'CONTACTS' && (
-          <div className="rounded-2xl border border-(--border-panel) bg-(--bg-panel) p-5 space-y-4 shadow-sm">
-            <h3 className="text-sm font-bold text-(--text-primary) border-b border-(--border-subtle) pb-3">
-              Organizer Contact &amp; Social Links
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                  Official Support Email
-                </label>
-                <input
-                  type="email"
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  placeholder="eic@pec.edu.in"
-                  className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                  Helpline Contact Number / WhatsApp
-                </label>
-                <input
-                  type="text"
-                  value={contactPhone}
-                  onChange={(e) => setContactPhone(e.target.value)}
-                  placeholder="+91 98765 43210"
-                  className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                  Instagram Handle URL
-                </label>
-                <input
-                  type="url"
-                  value={socialInstagram}
-                  onChange={(e) => setSocialInstagram(e.target.value)}
-                  placeholder="https://instagram.com/eic_pec"
-                  className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                  LinkedIn Company URL
-                </label>
-                <input
-                  type="url"
-                  value={socialLinkedin}
-                  onChange={(e) => setSocialLinkedin(e.target.value)}
-                  placeholder="https://linkedin.com/company/eic-pec"
-                  className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-(--text-primary) mb-1">
-                  YouTube Channel / Video Archive
-                </label>
-                <input
-                  type="url"
-                  value={socialYoutube}
-                  onChange={(e) => setSocialYoutube(e.target.value)}
-                  placeholder="https://youtube.com/@eicpec"
-                  className="w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none"
-                />
-              </div>
-            </div>
-          </div>
+          <ContactsTab
+            contactEmail={contactEmail}
+            setContactEmail={setContactEmail}
+            contactPhone={contactPhone}
+            setContactPhone={setContactPhone}
+            socialInstagram={socialInstagram}
+            setSocialInstagram={setSocialInstagram}
+            socialLinkedin={socialLinkedin}
+            setSocialLinkedin={setSocialLinkedin}
+            socialYoutube={socialYoutube}
+            setSocialYoutube={setSocialYoutube}
+          />
         )}
       </div>
     </AppShell>
