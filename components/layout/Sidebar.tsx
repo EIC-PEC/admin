@@ -58,7 +58,7 @@ const NAV_ITEMS: NavItem[] = [
     name: 'Alumni Directory',
     href: '/alumni',
     icon: GraduationCap,
-    roles: ['SUPER_ADMIN', 'ORGANIZER', 'DELEGATE'],
+    roles: ['SUPER_ADMIN', 'ORGANIZER'],
   },
   {
     name: 'Subscribers List',
