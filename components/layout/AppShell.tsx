@@ -79,7 +79,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       {/* Main Content Area */}
       <div
         className={`flex flex-col min-h-screen transition-all duration-200 min-w-0 w-full max-w-full overflow-x-hidden ${
-          collapsed ? 'lg:pl-16' : 'lg:pl-60'
+          collapsed ? 'lg:pl-16' : 'lg:pl-64'
         }`}
       >
         <Header

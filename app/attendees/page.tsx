@@ -12,10 +12,13 @@ import {
   Users,
   Check,
   QrCode,
+  Mail,
+  Send,
+  Loader2,
 } from 'lucide-react';
 import { AppShell } from '../../components/layout/AppShell';
 import { Badge } from '../../components/ui/Badge';
-import { api } from '../../lib/api';
+import { api, ApiError } from '../../lib/api';
 import { useAuth } from '../../lib/auth-context';
 import { Registration } from '../../lib/types';
 
@@ -27,11 +30,14 @@ export default function AttendeesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(25);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [search, setSearch] = useState('');
   const [passFilter, setPassFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [selectedDelegate, setSelectedDelegate] = useState<Registration | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [resendingId, setResendingId] = useState<string | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<string | null>(null);
 
   const fetchDelegates = useCallback(async (targetPage = page) => {
     if (!isAuthenticated) return;
@@ -78,41 +84,69 @@ export default function AttendeesPage() {
 
   const handleToggleOverride = async (reg: Registration) => {
     setUpdatingId(reg.id);
-    const res = await api.toggleCheckInOverride(reg.id);
-    if (res.success) {
-      setDelegates((prev) =>
-        prev.map((d) => (d.id === reg.id ? { ...d, isCheckedIn: res.isCheckedIn } : d))
-      );
-      if (selectedDelegate && selectedDelegate.id === reg.id) {
-        setSelectedDelegate({ ...selectedDelegate, isCheckedIn: res.isCheckedIn });
+    try {
+      const res = await api.toggleCheckInOverride(reg.id);
+      if (res.success) {
+        setDelegates((prev) =>
+          prev.map((d) => (d.id === reg.id ? { ...d, isCheckedIn: res.isCheckedIn } : d))
+        );
+        if (selectedDelegate && selectedDelegate.id === reg.id) {
+          setSelectedDelegate({ ...selectedDelegate, isCheckedIn: res.isCheckedIn });
+        }
       }
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : 'Failed to update check-in status');
+    } finally {
+      setUpdatingId(null);
     }
-    setUpdatingId(null);
   };
 
-  const exportToCsv = () => {
-    const headers = ['Pass ID', 'Name', 'Email', 'Phone', 'College', 'Pass Type', 'Amount Paid (INR)', 'Checked In', 'Registered At'];
-    const rows = delegates.map((d) => [
-      d.passId,
-      `"${d.user.name}"`,
-      d.user.email,
-      d.user.phone || 'N/A',
-      `"${d.user.college || 'N/A'}"`,
-      d.passType,
-      d.amountPaid,
-      d.isCheckedIn ? 'YES' : 'NO',
-      new Date(d.createdAt).toLocaleDateString(),
-    ]);
+  const handleResendPassEmail = async (reg: Registration) => {
+    setResendingId(reg.id);
+    setActionFeedback(null);
+    try {
+      const res = await api.resendPassEmail(reg.id);
+      setActionFeedback(`Pass confirmation email sent to ${reg.user.email}`);
+      setTimeout(() => setActionFeedback(null), 5000);
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : 'Failed to resend pass email.');
+    } finally {
+      setResendingId(null);
+    }
+  };
 
-    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `pec_summit_attendees_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const exportToCsv = async () => {
+    setExporting(true);
+    try {
+      // Fetch full database attendee list without pagination limit
+      const allDelegates = await api.exportAllDelegates();
+      const headers = ['Pass ID', 'Name', 'Email', 'Phone', 'College', 'Pass Type', 'Amount Paid (INR)', 'Checked In', 'Registered At'];
+      const rows = allDelegates.map((d) => [
+        d.passId,
+        `"${d.name}"`,
+        d.email,
+        d.phone || 'N/A',
+        `"${d.college || 'N/A'}"`,
+        d.passType,
+        d.amountPaid,
+        d.isCheckedIn ? 'YES' : 'NO',
+        new Date(d.createdAt).toISOString(),
+      ]);
+
+      const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `pec_summit_all_attendees_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch {
+      alert('Could not export full database list. Downloading current page.');
+    } finally {
+      setExporting(false);
+    }
   };
 
   return (
@@ -140,10 +174,11 @@ export default function AttendeesPage() {
           <div className="flex items-center gap-2.5">
             <button
               onClick={exportToCsv}
-              className="flex items-center gap-1.5 rounded-lg border border-(--border-panel) bg-(--bg-panel-alt) px-3 py-1.5 text-xs font-semibold text-(--text-secondary) hover:text-(--text-primary) hover:border-(--border-panel-elevated) transition-colors"
+              disabled={exporting}
+              className="flex items-center gap-1.5 rounded-lg border border-(--border-panel) bg-(--bg-panel-alt) px-3 py-1.5 text-xs font-semibold text-(--text-secondary) hover:text-(--text-primary) hover:border-(--border-panel-elevated) transition-colors disabled:opacity-50"
             >
-              <Download className="h-3.5 w-3.5" />
-              <span>Export CSV</span>
+              <Download className={`h-3.5 w-3.5 ${exporting ? 'animate-bounce text-emerald-500' : ''}`} />
+              <span>{exporting ? 'Exporting All...' : 'Export Full CSV'}</span>
             </button>
             <button
               onClick={() => fetchDelegates()}
@@ -154,6 +189,13 @@ export default function AttendeesPage() {
             </button>
           </div>
         </div>
+
+        {actionFeedback && (
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
+            <span>{actionFeedback}</span>
+          </div>
+        )}
 
         {/* Filter & Search Bar */}
         <div className="flex flex-col md:flex-row items-center gap-2.5">
@@ -281,6 +323,20 @@ export default function AttendeesPage() {
 
                       {/* Actions */}
                       <td className="py-3 px-4 text-right whitespace-nowrap space-x-1.5">
+                        <button
+                          onClick={() => handleResendPassEmail(d)}
+                          disabled={resendingId === d.id}
+                          className="inline-flex items-center gap-1 rounded-md bg-(--bg-panel-alt) border border-(--border-subtle) px-2 py-1 text-xs text-(--text-secondary) hover:text-emerald-500 hover:border-emerald-500/30 transition-colors disabled:opacity-50"
+                          title="Resend QR Pass Email to Delegate"
+                        >
+                          {resendingId === d.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin text-emerald-500" />
+                          ) : (
+                            <Mail className="h-3 w-3" />
+                          )}
+                          <span>Resend</span>
+                        </button>
+
                         <button
                           onClick={() => setSelectedDelegate(d)}
                           className="inline-flex items-center gap-1 rounded-md bg-(--bg-panel-alt) border border-(--border-subtle) px-2 py-1 text-xs text-(--text-secondary) hover:text-(--text-primary) transition-colors"

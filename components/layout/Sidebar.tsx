@@ -14,6 +14,8 @@ import {
   ChevronRight,
   ExternalLink,
   Sliders,
+  Mail,
+  ShieldCheck,
 } from 'lucide-react';
 
 import { useAuth } from '../../lib/auth-context';
@@ -41,13 +43,13 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ORGANIZER', 'VOLUNTEER_CHECKIN'],
   },
   {
-    name: 'Site Config & Alerts',
-    href: '/config',
-    icon: Sliders,
+    name: 'Content & Schedule',
+    href: '/cms',
+    icon: CalendarDays,
     roles: ['SUPER_ADMIN', 'ORGANIZER'],
   },
   {
-    name: 'Media & Assets',
+    name: 'Media & Showcase',
     href: '/media',
     icon: FolderGit2,
     roles: ['SUPER_ADMIN', 'ORGANIZER'],
@@ -59,9 +61,21 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ORGANIZER', 'DELEGATE'],
   },
   {
-    name: 'Schedule & Speakers',
-    href: '/cms',
-    icon: CalendarDays,
+    name: 'Subscribers List',
+    href: '/subscribers',
+    icon: Mail,
+    roles: ['SUPER_ADMIN', 'ORGANIZER'],
+  },
+  {
+    name: 'Site Config & Alerts',
+    href: '/config',
+    icon: Sliders,
+    roles: ['SUPER_ADMIN', 'ORGANIZER'],
+  },
+  {
+    name: 'Security & Audit Logs',
+    href: '/audit',
+    icon: ShieldCheck,
     roles: ['SUPER_ADMIN', 'ORGANIZER'],
   },
 ];
@@ -99,7 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         mobileOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0'
       } ${
         // Desktop collapse behavior
-        collapsed ? 'lg:w-16' : 'lg:w-60'
+        collapsed ? 'lg:w-16' : 'lg:w-64'
       }`}
     >
       {/* Top Header & Toggle */}
@@ -156,13 +170,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           if (collapsed) {
             return (
               <div key={item.href}>
-                {/* Desktop collapsed icon */}
+                {/* Desktop icon-only button */}
                 <Link
                   href={item.href}
                   onClick={handleLinkClick}
                   className={`hidden lg:flex h-10 w-10 mx-auto rounded-xl items-center justify-center transition-all ${
                     isActive
-                      ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                      ? 'bg-emerald-500 text-slate-950 shadow-sm font-semibold'
                       : 'text-(--text-secondary) hover:bg-(--bg-panel-alt) hover:text-(--text-primary)'
                   }`}
                   title={item.name}
@@ -229,16 +243,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <ExternalLink className="h-3 w-3" />
           </a>
 
-          <div className="flex items-center justify-between pt-2 border-t border-(--border-subtle) px-1">
-            <div className="flex items-center gap-2 truncate">
+          <div className="flex items-center justify-between pt-2 border-t border-(--border-subtle) px-1 gap-2 min-w-0">
+            <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold shrink-0">
                 {user?.name ? user.name.slice(0, 2).toUpperCase() : 'SA'}
               </div>
-              <div className="flex flex-col truncate">
+              <div className="flex flex-col min-w-0 flex-1 overflow-hidden">
                 <span className="text-xs font-bold text-(--text-primary) truncate">
                   {user?.name || 'Super Admin'}
                 </span>
-                <span className="text-[10px] text-(--text-muted) truncate uppercase tracking-wider">
+                <span className="text-[10px] text-(--text-muted) truncate uppercase tracking-wider font-mono">
                   {(role || 'SUPER_ADMIN').replace('_', ' ')}
                 </span>
               </div>

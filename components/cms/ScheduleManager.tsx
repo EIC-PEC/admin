@@ -207,30 +207,31 @@ export const ScheduleManager: React.FC<ScheduleManagerProps> = ({
           filtered.map((item, idx) => (
             <div
               key={item.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-(--border-panel) bg-(--bg-panel) hover:border-(--border-panel-elevated) transition-all gap-3 sm:gap-4 shadow-sm"
+              className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border border-(--border-panel) bg-(--bg-panel) hover:border-(--border-panel-elevated) transition-all gap-3.5 sm:gap-4 shadow-xs group"
             >
-              <div className="flex flex-col xs:flex-row items-start xs:items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                {/* Time Badge */}
-                <div className="w-full xs:w-28 shrink-0 rounded-xl bg-(--bg-panel-alt) p-2 text-center border border-(--border-subtle) flex xs:flex-col justify-between xs:justify-center items-center">
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 block font-mono">
+              {/* Left & Center: Time + Details */}
+              <div className="flex items-start sm:items-center gap-3.5 sm:gap-4 min-w-0 flex-1">
+                {/* Time Badge - fixed width pill */}
+                <div className="shrink-0 rounded-xl bg-(--bg-panel-alt) px-3 py-2 text-center border border-(--border-subtle) min-w-[90px]">
+                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 block font-mono whitespace-nowrap">
                     {item.time}
                   </span>
-                  <span className="text-[10px] text-(--text-muted) font-semibold uppercase tracking-wider">
-                    SLOT #{idx + 1}
+                  <span className="text-[10px] text-(--text-muted) font-semibold uppercase tracking-wider block mt-0.5">
+                    Slot #{idx + 1}
                   </span>
                 </div>
 
                 {/* Session Details */}
                 <div className="space-y-1 min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 uppercase shrink-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 uppercase tracking-wide shrink-0">
                       {item.tag}
                     </span>
-                    <span className="text-xs text-(--text-muted) truncate">
+                    <span className="text-xs text-(--text-muted) font-medium truncate">
                       &bull; {item.venueName}
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-(--text-primary) break-words">
+                  <h3 className="text-sm font-bold text-(--text-primary) leading-snug">
                     {item.title}
                   </h3>
                   <div className="flex items-center gap-1.5 text-xs text-(--text-muted)">
@@ -240,21 +241,21 @@ export const ScheduleManager: React.FC<ScheduleManagerProps> = ({
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex items-center gap-1.5 self-end sm:self-center shrink-0 border-t xs:border-t-0 border-(--border-subtle) pt-2 xs:pt-0 w-full xs:w-auto justify-end">
+              {/* Right: Actions */}
+              <div className="flex items-center gap-1.5 self-end sm:self-center shrink-0">
                 <button
                   onClick={() => openEditModal(item)}
-                  className="p-1.5 rounded-lg border border-(--border-subtle) bg-(--bg-panel-alt) text-(--text-muted) hover:text-emerald-500 transition-colors"
+                  className="p-1.5 rounded-lg text-(--text-muted) hover:text-emerald-500 hover:bg-(--bg-panel-alt) transition-colors"
                   title="Edit Slot"
                 >
-                  <Pencil className="h-3.5 w-3.5" />
+                  <Pencil className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => handleDelete(item.id)}
-                  className="p-1.5 rounded-lg border border-(--border-subtle) bg-(--bg-panel-alt) text-(--text-muted) hover:text-rose-500 transition-colors"
+                  className="p-1.5 rounded-lg text-(--text-muted) hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
                   title="Delete Slot"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             </div>

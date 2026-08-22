@@ -217,26 +217,48 @@ export const EVENT_TYPES = [
 
 export interface EventItem {
   id: string;
+  number?: string;
   title: string;
-  type: string;
-  track?: string;
-  day: 1 | 2;
-  startTime: string;
-  endTime: string;
-  venue: string;
-  speakerIds: string[];
+  category?: string;
+  eyebrow?: string;
+  image?: string;
+  purpose?: string;
+  delivery?: string;
+  expectedParticipation?: string;
+  tags?: string[];
+  partner?: string | null;
+  registrationUrl?: string | null;
+  type?: string;
+  track?: string | null;
+  day?: 1 | 2 | number;
+  startTime?: string;
+  endTime?: string;
+  venue?: string;
+  speakerIds?: string[];
+  order?: number;
 }
 
 /** Body accepted by POST /events; PUT /events/:id accepts Partial<EventInput>. */
 export interface EventInput {
+  number?: string;
   title: string;
-  type: string;
+  category?: string;
+  eyebrow?: string;
+  image?: string;
+  purpose?: string;
+  delivery?: string;
+  expectedParticipation?: string;
+  tags?: string[];
+  partner?: string;
+  registrationUrl?: string;
+  type?: string;
   track?: string;
-  day: 1 | 2;
-  startTime: string;
-  endTime: string;
-  venue: string;
+  day?: 1 | 2 | number;
+  startTime?: string;
+  endTime?: string;
+  venue?: string;
   speakerIds?: string[];
+  order?: number;
 }
 
 export interface ScheduleItem {
@@ -411,5 +433,37 @@ export interface SiteConfigInput {
   announcementLink?: string;
   stats?: Record<string, string>;
   contacts?: Record<string, unknown>;
+}
+
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+  order: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface FaqInput {
+  question: string;
+  answer: string;
+  category?: string;
+  order?: number;
+}
+
+export interface AuditLogItem {
+  id: string;
+  userId?: string | null;
+  userEmail?: string | null;
+  action: string;
+  entity: string;
+  entityId?: string | null;
+  method: string;
+  path: string;
+  statusCode?: number | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  createdAt: string;
 }
 

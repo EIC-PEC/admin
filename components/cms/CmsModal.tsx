@@ -4,7 +4,8 @@ import React from 'react';
 import { X } from 'lucide-react';
 
 interface Props {
-  open: boolean;
+  open?: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   title: string;
   subtitle?: string;
@@ -13,8 +14,9 @@ interface Props {
   children: React.ReactNode;
 }
 
-export function CmsModal({ open, onClose, title, subtitle, icon, accentColor = '#10B981', children }: Props) {
-  if (!open) return null;
+export function CmsModal({ open, isOpen, onClose, title, subtitle, icon, accentColor = '#10B981', children }: Props) {
+  const isVisible = open ?? isOpen ?? false;
+  if (!isVisible) return null;
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-sm overflow-y-auto"

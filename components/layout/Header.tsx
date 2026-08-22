@@ -23,7 +23,9 @@ const ROUTE_TITLES: Record<string, string> = {
   '/config': 'Site Config & Live Alerts',
   '/media': 'Media & Brand Assets',
   '/alumni': 'Alumni Directory',
-  '/cms': 'Schedule & Speakers',
+  '/cms': 'Summit Content & Schedule CMS',
+  '/subscribers': 'Subscribers Directory',
+  '/audit': 'Security & Audit Logs',
 };
 
 const ROLE_LABELS: Record<Role, { label: string; className: string }> = {

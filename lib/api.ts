@@ -241,6 +241,47 @@ class ApiClient {
     return { success: true, isCheckedIn: data.isCheckedIn };
   }
 
+  async exportAllDelegates(): Promise<Array<{
+    id: string;
+    passId: string;
+    passType: string;
+    amountPaid: number;
+    isCheckedIn: boolean;
+    name: string;
+    email: string;
+    phone: string;
+    college: string;
+    paymentStatus: string;
+    createdAt: string;
+  }>> {
+    return this.request('/admin/delegates/export');
+  }
+
+  async resendPassEmail(registrationId: string): Promise<{ success: boolean; message: string }> {
+    return this.request<{ success: boolean; message: string }>(
+      `/admin/delegates/${registrationId}/resend-pass`,
+      { method: 'POST' },
+    );
+  }
+
+  // ── Audit & Security Logs ──
+  async getAuditLogs(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    action?: string;
+    entity?: string;
+  }): Promise<{ items: import('./types').AuditLogItem[]; total: number; totalPages: number }> {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', params.page.toString());
+    if (params?.limit) query.set('limit', params.limit.toString());
+    if (params?.search) query.set('search', params.search);
+    if (params?.action && params.action !== 'ALL') query.set('action', params.action);
+    if (params?.entity && params.entity !== 'ALL') query.set('entity', params.entity);
+    const qs = query.toString();
+    return this.request(`/admin/audit-logs${qs ? `?${qs}` : ''}`);
+  }
+
   // ── QR Scanner & Manual Lookup ──
   /**
    * Verifies a signed QR token against POST /checkin/verify-qr. On a fresh
@@ -437,6 +478,34 @@ class ApiClient {
     return this.request<import('./types').SubscriberItem[]>('/subscribers');
   }
 
+  async deleteSubscriber(id: string): Promise<void> {
+    await this.request<void>(`/subscribers/${id}`, { method: 'DELETE' });
+  }
+
+  // ── CMS: FAQs ──
+  async getFaqs(category?: string): Promise<import('./types').FaqItem[]> {
+    const qs = category && category !== 'All' ? `?category=${encodeURIComponent(category)}` : '';
+    return this.request<import('./types').FaqItem[]>(`/cms/faqs${qs}`);
+  }
+
+  async createFaq(input: import('./types').FaqInput): Promise<import('./types').FaqItem> {
+    return this.request<import('./types').FaqItem>('/cms/faqs', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  }
+
+  async updateFaq(id: string, input: Partial<import('./types').FaqInput>): Promise<import('./types').FaqItem> {
+    return this.request<import('./types').FaqItem>(`/cms/faqs/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(input),
+    });
+  }
+
+  async deleteFaq(id: string): Promise<void> {
+    await this.request<void>(`/cms/faqs/${id}`, { method: 'DELETE' });
+  }
+
   // ── CMS: Alumni ──
   async getAlumni(): Promise<import('./types').AlumniItem[]> {
     return this.request<import('./types').AlumniItem[]>('/alumni');
@@ -525,6 +594,7 @@ class ApiClient {
     alumni: import('./types').AlumniItem[];
     gallery: import('./types').GalleryItem[];
     portfolioMedia?: import('./types').PortfolioEventMedia[];
+    faqs?: import('./types').FaqItem[];
   }> {
     return this.request('/cms/bundle');
   }
