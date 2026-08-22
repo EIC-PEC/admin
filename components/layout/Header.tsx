@@ -89,24 +89,24 @@ export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle 
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-(--border-panel) bg-(--bg-panel) px-4 lg:px-8 transition-colors">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-(--border-panel) bg-(--bg-panel) px-3 sm:px-6 lg:px-8 transition-colors gap-2">
       {/* Left: Mobile Toggle & Breadcrumbs */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         {onMobileNavToggle && (
           <button
             type="button"
             onClick={onMobileNavToggle}
-            className="lg:hidden p-2 rounded-lg border border-(--border-subtle) bg-(--bg-panel-alt) text-(--text-muted) hover:text-(--text-primary) transition-colors"
+            className="lg:hidden p-1.5 sm:p-2 rounded-lg border border-(--border-subtle) bg-(--bg-panel-alt) text-(--text-muted) hover:text-(--text-primary) transition-colors shrink-0"
             title="Open Menu"
           >
             <Menu className="h-4 w-4" />
           </button>
         )}
 
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex items-center gap-1.5 text-xs min-w-0">
           <span className="text-(--text-muted) font-medium hidden sm:inline">Console</span>
           <span className="text-(--text-muted) hidden sm:inline">/</span>
-          <span className="text-(--text-primary) font-semibold truncate">{currentTitle}</span>
+          <span className="text-(--text-primary) font-semibold truncate max-w-[130px] xs:max-w-[180px] sm:max-w-none">{currentTitle}</span>
         </div>
       </div>
 
@@ -114,24 +114,24 @@ export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle 
       {onSearchOpen && (
         <button
           onClick={onSearchOpen}
-          className="hidden md:flex items-center gap-2.5 rounded-lg border border-(--border-panel) bg-(--bg-panel-alt) px-3.5 py-1.5 text-xs text-(--text-muted) hover:border-emerald-500/50 hover:text-(--text-primary) transition-all font-medium w-64 lg:w-80 justify-between"
+          className="hidden md:flex items-center gap-2.5 rounded-lg border border-(--border-panel) bg-(--bg-panel-alt) px-3.5 py-1.5 text-xs text-(--text-muted) hover:border-emerald-500/50 hover:text-(--text-primary) transition-all font-medium w-52 lg:w-80 justify-between"
         >
-          <div className="flex items-center gap-2">
-            <Search className="h-3.5 w-3.5 text-(--text-muted)" />
-            <span className="truncate">Search attendees, passes, records...</span>
+          <div className="flex items-center gap-2 truncate">
+            <Search className="h-3.5 w-3.5 text-(--text-muted) shrink-0" />
+            <span className="truncate">Search attendees, passes...</span>
           </div>
-          <kbd className="rounded bg-(--bg-panel-elevated) px-1.5 py-0.5 text-[10px] text-(--text-muted) font-mono border border-(--border-subtle)">
+          <kbd className="rounded bg-(--bg-panel-elevated) px-1.5 py-0.5 text-[10px] text-(--text-muted) font-mono border border-(--border-subtle) shrink-0">
             ⌘K
           </kbd>
         </button>
       )}
 
       {/* Right: API Status & Theme Switcher */}
-      <div className="flex items-center gap-2.5 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         {/* Backend status dot */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--bg-panel-alt) border border-(--border-subtle) text-[11px] font-medium">
+        <div className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-full bg-(--bg-panel-alt) border border-(--border-subtle) text-[11px] font-medium shrink-0">
           <span 
-            className={`h-1.5 w-1.5 rounded-full ${
+            className={`h-1.5 w-1.5 rounded-full shrink-0 ${
               isBackendHealthy === true 
                 ? 'bg-emerald-500' 
                 : isBackendHealthy === false 
@@ -139,9 +139,10 @@ export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle 
                 : 'bg-amber-500'
             }`} 
           />
-          <span className="text-(--text-muted) hidden sm:inline">API:</span>
-          <span className={isBackendHealthy ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-rose-500'}>
-            {isBackendHealthy ? 'Connected' : isBackendHealthy === false ? 'Offline' : 'Connecting'}
+          <span className="text-(--text-muted) hidden md:inline">API:</span>
+          <span className={`text-[10px] sm:text-xs font-semibold ${isBackendHealthy ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
+            <span className="hidden xs:inline">{isBackendHealthy ? 'Connected' : isBackendHealthy === false ? 'Offline' : 'Connecting'}</span>
+            <span className="xs:hidden">{isBackendHealthy ? 'Live' : 'Off'}</span>
           </span>
         </div>
 
@@ -149,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle 
         <button
           type="button"
           onClick={toggleTheme}
-          className="p-1.5 rounded-lg border border-(--border-subtle) bg-(--bg-panel-alt) text-(--text-secondary) hover:text-emerald-500 hover:border-emerald-500/40 transition-all"
+          className="p-1.5 rounded-lg border border-(--border-subtle) bg-(--bg-panel-alt) text-(--text-secondary) hover:text-emerald-500 hover:border-emerald-500/40 transition-all shrink-0"
           title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
         >
           {theme === 'dark' ? (
@@ -161,7 +162,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle 
 
         {/* User Role Badge */}
         {roleBadge && (
-          <span className={`text-[11px] font-bold rounded-md px-2 py-0.5 border ${roleBadge.className}`}>
+          <span className={`text-[10px] sm:text-[11px] font-bold rounded-md px-2 py-0.5 border shrink-0 hidden xs:inline-block ${roleBadge.className}`}>
             {roleBadge.label}
           </span>
         )}
