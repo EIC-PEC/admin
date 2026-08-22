@@ -120,7 +120,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
             <div className="mt-3 max-h-96 overflow-y-auto space-y-2">
               {searching ? (
                 <p className="py-6 text-center text-xs text-zinc-400">
-                  Querying delegate registry...
+                  Querying attendee registry...
                 </p>
               ) : searchResults.length > 0 ? (
                 searchResults.map((d) => (

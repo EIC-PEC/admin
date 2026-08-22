@@ -19,7 +19,7 @@ interface HeaderProps {
 
 const ROUTE_TITLES: Record<string, string> = {
   '/': 'Overview Dashboard',
-  '/delegates': 'Delegates & Passes',
+  '/delegates': 'Attendees & Passes',
   '/config': 'Site Config & Live Alerts',
   '/media': 'Media & Brand Assets',
   '/alumni': 'Alumni Directory',
@@ -31,7 +31,7 @@ const ROLE_LABELS: Record<Role, { label: string; className: string }> = {
   ORGANIZER: { label: 'Organizer', className: 'text-sky-600 dark:text-sky-400 bg-sky-500/10 border-sky-500/20' },
   VOLUNTEER_CHECKIN: { label: 'Gate Volunteer', className: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20' },
   INVESTOR: { label: 'Judge / Investor', className: 'text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20' },
-  DELEGATE: { label: 'Delegate', className: 'text-(--text-secondary) bg-(--bg-panel-alt) border-(--border-subtle)' },
+  DELEGATE: { label: 'Attendee', className: 'text-(--text-secondary) bg-(--bg-panel-alt) border-(--border-subtle)' },
 };
 
 export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle }) => {

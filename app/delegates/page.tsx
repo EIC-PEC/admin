@@ -123,7 +123,7 @@ export default function DelegatesPage() {
               </span>
             </div>
             <h1 className="text-2xl font-bold text-(--text-primary) tracking-tight">
-              Delegates &amp; Pass Manager
+              Attendees &amp; Pass Manager
             </h1>
             <p className="text-xs text-(--text-muted) mt-0.5">
               Verify registrations, inspect digital passes, and record gate check-ins.
@@ -322,7 +322,7 @@ export default function DelegatesPage() {
                 <option value={100}>100</option>
               </select>
               <span className="text-(--text-muted) ml-2">
-                Showing {total === 0 ? 0 : (page - 1) * limit + 1} to {Math.min(total, page * limit)} of {total} delegates
+                Showing {total === 0 ? 0 : (page - 1) * limit + 1} to {Math.min(total, page * limit)} of {total} attendees
               </span>
             </div>
 
@@ -361,7 +361,7 @@ export default function DelegatesPage() {
 
               <div className="text-center space-y-1">
                 <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                  Official Delegate Pass
+                  Official Summit Pass
                 </span>
                 <h3 className="text-base font-bold text-(--text-primary) mt-1">
                   PEC E-Summit 2026

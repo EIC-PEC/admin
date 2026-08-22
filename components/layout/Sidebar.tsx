@@ -35,7 +35,7 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'ORGANIZER', 'VOLUNTEER_CHECKIN', 'INVESTOR', 'DELEGATE'],
   },
   {
-    name: 'Delegates & Passes',
+    name: 'Attendees & Passes',
     href: '/delegates',
     icon: Users,
     roles: ['SUPER_ADMIN', 'ORGANIZER', 'VOLUNTEER_CHECKIN'],

@@ -98,7 +98,7 @@ export default function DashboardHome() {
               className="flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-3.5 py-1.5 text-xs font-bold text-slate-950 shadow-sm transition-all uppercase tracking-wider"
             >
               <Users className="h-3.5 w-3.5" />
-              <span>Delegates Roster</span>
+              <span>Attendees Directory</span>
             </Link>
           </div>
         </div>
@@ -235,7 +235,7 @@ export default function DashboardHome() {
                 href="/delegates"
                 className="flex items-center justify-between text-xs text-sky-600 dark:text-sky-400 hover:underline font-semibold"
               >
-                <span>View all delegate records</span>
+                <span>View all attendee records</span>
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </Link>
             </div>
