@@ -19,7 +19,7 @@ interface HeaderProps {
 
 const ROUTE_TITLES: Record<string, string> = {
   '/': 'Overview Dashboard',
-  '/delegates': 'Attendees & Passes',
+  '/attendees': 'Attendees & Passes',
   '/config': 'Site Config & Live Alerts',
   '/media': 'Media & Brand Assets',
   '/alumni': 'Alumni Directory',

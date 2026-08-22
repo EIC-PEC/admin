@@ -94,7 +94,7 @@ export default function DashboardHome() {
             </button>
 
             <Link
-              href="/delegates"
+              href="/attendees"
               className="flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-3.5 py-1.5 text-xs font-bold text-slate-950 shadow-sm transition-all uppercase tracking-wider"
             >
               <Users className="h-3.5 w-3.5" />
@@ -232,7 +232,7 @@ export default function DashboardHome() {
 
             <div className="mt-5 border-t border-(--border-subtle) pt-3">
               <Link
-                href="/delegates"
+                href="/attendees"
                 className="flex items-center justify-between text-xs text-sky-600 dark:text-sky-400 hover:underline font-semibold"
               >
                 <span>View all attendee records</span>
@@ -249,7 +249,7 @@ export default function DashboardHome() {
               Recent Attendee Registrations
             </h2>
             <Link
-              href="/delegates"
+              href="/attendees"
               className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold flex items-center gap-1"
             >
               <span>Explore All</span>
