@@ -40,10 +40,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ? sessionStorage.getItem('esummit_admin_token') || localStorage.getItem('esummit_admin_token')
           : null;
 
-      if (storedToken) {
-        api.setToken(storedToken);
-        setToken(storedToken);
+      if (!storedToken) {
+        if (isMounted) {
+          setUser(null);
+          setToken(null);
+          setIsLoading(false);
+        }
+        return;
       }
+
+      api.setToken(storedToken);
+      setToken(storedToken);
 
       try {
         const res = await api.getMe();
@@ -53,24 +60,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setIsLoading(false);
         }
       } catch {
-        // Access token might be expired; attempt silent refresh via HttpOnly cookie
-        const refreshed = await api.refreshSession();
-        if (refreshed && isMounted) {
-          try {
-            const res = await api.getMe();
-            setUser(res.user);
-            setRole(res.user.role);
-            setToken(api.getToken());
-          } catch {
-            api.clearToken();
-            setUser(null);
-          }
-        } else if (isMounted) {
-          api.clearToken();
+        api.clearToken();
+        if (isMounted) {
           setToken(null);
           setUser(null);
+          setIsLoading(false);
         }
-        if (isMounted) setIsLoading(false);
       }
     };
 

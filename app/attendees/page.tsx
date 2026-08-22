@@ -16,9 +16,11 @@ import {
 import { AppShell } from '../../components/layout/AppShell';
 import { Badge } from '../../components/ui/Badge';
 import { api } from '../../lib/api';
+import { useAuth } from '../../lib/auth-context';
 import { Registration } from '../../lib/types';
 
 export default function AttendeesPage() {
+  const { isAuthenticated } = useAuth();
   const [delegates, setDelegates] = useState<Registration[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -32,6 +34,7 @@ export default function AttendeesPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const fetchDelegates = useCallback(async (targetPage = page) => {
+    if (!isAuthenticated) return;
     setLoading(true);
     const params: {
       page?: number;
@@ -55,14 +58,18 @@ export default function AttendeesPage() {
       setTotal(res.total);
       setTotalPages(res.totalPages || 1);
       setPage(targetPage);
+    } catch {
+      // Backend offline or unauthorized
     } finally {
       setLoading(false);
     }
-  }, [search, passFilter, statusFilter, limit, page]);
+  }, [isAuthenticated, search, passFilter, statusFilter, limit, page]);
 
   useEffect(() => {
-    fetchDelegates(1);
-  }, [passFilter, statusFilter, limit]);
+    if (isAuthenticated) {
+      fetchDelegates(1);
+    }
+  }, [isAuthenticated, passFilter, statusFilter, limit]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
