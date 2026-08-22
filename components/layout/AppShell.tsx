@@ -14,6 +14,7 @@ interface AppShellProps {
 
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Registration[]>([]);
@@ -33,8 +34,21 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-(--bg-void) text-(--text-primary) transition-colors duration-200">
+      {/* Mobile Backdrop Overlay */}
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden transition-opacity"
+        />
+      )}
+
       {/* Sidebar Navigation */}
-      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+      <Sidebar
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
 
       {/* Main Content Area */}
       <div
@@ -42,9 +56,12 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
           collapsed ? 'lg:pl-16' : 'lg:pl-60'
         }`}
       >
-        <Header onSearchOpen={() => setSearchOpen(true)} />
+        <Header
+          onSearchOpen={() => setSearchOpen(true)}
+          onMobileNavToggle={() => setMobileOpen((prev) => !prev)}
+        />
 
-        <main className="flex-1 p-4 lg:p-8">
+        <main className="flex-1 p-3.5 sm:p-4 lg:p-8">
           <div className="mx-auto max-w-7xl">{children}</div>
         </main>
       </div>

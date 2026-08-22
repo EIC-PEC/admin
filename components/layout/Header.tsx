@@ -6,7 +6,8 @@ import {
   Search, 
   ExternalLink,
   Sun,
-  Moon
+  Moon,
+  Menu,
 } from 'lucide-react';
 import { useAuth } from '../../lib/auth-context';
 import { Role } from '../../lib/types';
@@ -14,6 +15,7 @@ import { api } from '../../lib/api';
 
 interface HeaderProps {
   onSearchOpen?: () => void;
+  onMobileNavToggle?: () => void;
 }
 
 const ROUTE_TITLES: Record<string, string> = {
@@ -33,7 +35,7 @@ const ROLE_LABELS: Record<Role, { label: string; className: string }> = {
   DELEGATE: { label: 'Delegate', className: 'text-(--text-secondary) bg-(--bg-panel-alt) border-(--border-subtle)' },
 };
 
-export const Header: React.FC<HeaderProps> = ({ onSearchOpen }) => {
+export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle }) => {
   const pathname = usePathname();
   const { role, user } = useAuth();
   const roleBadge = role ? ROLE_LABELS[role] : null;
@@ -91,11 +93,24 @@ export const Header: React.FC<HeaderProps> = ({ onSearchOpen }) => {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-(--border-panel) bg-(--bg-panel) px-4 lg:px-8 transition-colors">
-      {/* Left: Breadcrumbs */}
-      <div className="flex items-center gap-2 text-xs">
-        <span className="text-(--text-muted) font-medium">Console</span>
-        <span className="text-(--text-muted)">/</span>
-        <span className="text-(--text-primary) font-semibold">{currentTitle}</span>
+      {/* Left: Mobile Toggle & Breadcrumbs */}
+      <div className="flex items-center gap-3">
+        {onMobileNavToggle && (
+          <button
+            type="button"
+            onClick={onMobileNavToggle}
+            className="lg:hidden p-2 rounded-lg border border-(--border-subtle) bg-(--bg-panel-alt) text-(--text-muted) hover:text-(--text-primary) transition-colors"
+            title="Open Menu"
+          >
+            <Menu className="h-4 w-4" />
+          </button>
+        )}
+
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-(--text-muted) font-medium hidden sm:inline">Console</span>
+          <span className="text-(--text-muted) hidden sm:inline">/</span>
+          <span className="text-(--text-primary) font-semibold truncate">{currentTitle}</span>
+        </div>
       </div>
 
       {/* Center: Global Search Bar */}
