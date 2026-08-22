@@ -272,14 +272,23 @@ class ApiClient {
     action?: string;
     entity?: string;
   }): Promise<{ items: import('./types').AuditLogItem[]; total: number; totalPages: number }> {
-    const query = new URLSearchParams();
-    if (params?.page) query.set('page', params.page.toString());
-    if (params?.limit) query.set('limit', params.limit.toString());
-    if (params?.search) query.set('search', params.search);
-    if (params?.action && params.action !== 'ALL') query.set('action', params.action);
-    if (params?.entity && params.entity !== 'ALL') query.set('entity', params.entity);
-    const qs = query.toString();
-    return this.request(`/admin/audit-logs${qs ? `?${qs}` : ''}`);
+    try {
+      const query = new URLSearchParams();
+      if (params?.page) query.set('page', params.page.toString());
+      if (params?.limit) query.set('limit', params.limit.toString());
+      if (params?.search) query.set('search', params.search);
+      if (params?.action && params.action !== 'ALL') query.set('action', params.action);
+      if (params?.entity && params.entity !== 'ALL') query.set('entity', params.entity);
+      const qs = query.toString();
+      return await this.request<{ items: import('./types').AuditLogItem[]; total: number; totalPages: number }>(
+        `/admin/audit-logs${qs ? `?${qs}` : ''}`
+      );
+    } catch (err: any) {
+      if (err?.status === 404) {
+        return { items: [], total: 0, totalPages: 1 };
+      }
+      throw err;
+    }
   }
 
   // ── QR Scanner & Manual Lookup ──
@@ -487,42 +496,6 @@ class ApiClient {
 
   async deleteSubscriber(id: string): Promise<void> {
     await this.request<void>(`/subscribers/${id}`, { method: 'DELETE' });
-  }
-
-  // ── Security & Audit Logs ──
-  async getAuditLogs(params?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    action?: string;
-    entity?: string;
-  }): Promise<{
-    items: import('./types').AuditLogItem[];
-    total: number;
-    page: number;
-    totalPages: number;
-  }> {
-    try {
-      const q = new URLSearchParams();
-      if (params?.page) q.set('page', String(params.page));
-      if (params?.limit) q.set('limit', String(params.limit));
-      if (params?.search) q.set('search', params.search);
-      if (params?.action && params.action !== 'ALL') q.set('action', params.action);
-      if (params?.entity && params.entity !== 'ALL') q.set('entity', params.entity);
-
-      const qs = q.toString() ? `?${q.toString()}` : '';
-      return await this.request<{
-        items: import('./types').AuditLogItem[];
-        total: number;
-        page: number;
-        totalPages: number;
-      }>(`/admin/audit-logs${qs}`);
-    } catch (err: any) {
-      if (err?.status === 404) {
-        return { items: [], total: 0, page: params?.page || 1, totalPages: 1 };
-      }
-      throw err;
-    }
   }
 
   // ── CMS: FAQs ──
