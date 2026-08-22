@@ -31,9 +31,9 @@ const ROUTE_TITLES: Record<string, string> = {
 const ROLE_LABELS: Record<Role, { label: string; className: string }> = {
   SUPER_ADMIN: { label: 'Admin', className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25 font-semibold' },
   ORGANIZER: { label: 'Admin', className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25 font-semibold' },
-  VOLUNTEER_CHECKIN: { label: 'Gate Staff', className: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/25 font-semibold' },
-  INVESTOR: { label: 'Jury', className: 'text-sky-600 dark:text-sky-400 bg-sky-500/10 border-sky-500/25 font-semibold' },
-  DELEGATE: { label: 'Attendee', className: 'text-(--text-muted) bg-(--bg-panel-alt) border-(--border-subtle)' },
+  VOLUNTEER_CHECKIN: { label: 'Gate', className: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/25 font-semibold' },
+  INVESTOR: { label: 'Admin', className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25 font-semibold' },
+  DELEGATE: { label: 'User', className: 'text-(--text-muted) bg-(--bg-panel-alt) border-(--border-subtle)' },
 };
 
 export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle }) => {

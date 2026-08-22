@@ -34,7 +34,7 @@ const NAV_ITEMS: NavItem[] = [
     name: 'Dashboard',
     href: '/',
     icon: LayoutDashboard,
-    roles: ['SUPER_ADMIN', 'ORGANIZER', 'VOLUNTEER_CHECKIN', 'INVESTOR', 'DELEGATE'],
+    roles: ['SUPER_ADMIN', 'ORGANIZER', 'VOLUNTEER_CHECKIN'],
   },
   {
     name: 'Attendees & Passes',

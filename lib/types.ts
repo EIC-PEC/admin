@@ -3,9 +3,9 @@ export type Role = 'SUPER_ADMIN' | 'ORGANIZER' | 'VOLUNTEER_CHECKIN' | 'INVESTOR
 export const HUMAN_ROLE_NAMES: Record<Role, string> = {
   SUPER_ADMIN: 'Admin',
   ORGANIZER: 'Admin',
-  VOLUNTEER_CHECKIN: 'Gate Staff',
-  INVESTOR: 'Jury',
-  DELEGATE: 'Attendee',
+  VOLUNTEER_CHECKIN: 'Gate',
+  INVESTOR: 'Admin',
+  DELEGATE: 'User',
 };
 
 export function formatHumanRole(role?: Role | string | null): string {
