@@ -53,38 +53,38 @@ export default function MediaUploadCenterPage() {
           </div>
 
           {/* Segmented Tab Controls */}
-          <div className="flex items-center rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-1 gap-1">
+          <div className="flex items-center rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-1 gap-1 max-w-full overflow-x-auto w-full sm:w-fit">
             <button
               onClick={() => setActiveSection('SHOWCASE')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
                 activeSection === 'SHOWCASE'
                   ? 'bg-emerald-500 text-slate-950 shadow-sm'
                   : 'text-(--text-secondary) hover:text-(--text-primary)'
               }`}
             >
-              <Sparkles className="h-3.5 w-3.5" />
+              <Sparkles className="h-3.5 w-3.5 shrink-0" />
               <span>Showcase ({gallery.length}/16)</span>
             </button>
             <button
               onClick={() => setActiveSection('EVENTS')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
                 activeSection === 'EVENTS'
                   ? 'bg-emerald-500 text-slate-950 shadow-sm'
                   : 'text-(--text-secondary) hover:text-(--text-primary)'
               }`}
             >
-              <Image className="h-3.5 w-3.5" />
+              <Image className="h-3.5 w-3.5 shrink-0" />
               <span>Event Cards ({portfolioMedia.length}/13)</span>
             </button>
             <button
               onClick={() => setActiveSection('SPONSORS')}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
                 activeSection === 'SPONSORS'
                   ? 'bg-emerald-500 text-slate-950 shadow-sm'
                   : 'text-(--text-secondary) hover:text-(--text-primary)'
               }`}
             >
-              <Building2 className="h-3.5 w-3.5" />
+              <Building2 className="h-3.5 w-3.5 shrink-0" />
               <span>Sponsors ({sponsors.length}/12)</span>
             </button>
           </div>

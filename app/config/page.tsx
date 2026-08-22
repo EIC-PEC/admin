@@ -294,52 +294,52 @@ export default function SiteConfigPage() {
         )}
 
         {/* Segmented Navigation Tabs */}
-        <div className="flex rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-1 gap-1 w-fit overflow-x-auto">
+        <div className="flex rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-1 gap-1 max-w-full overflow-x-auto w-full sm:w-fit">
           <button
             onClick={() => setActiveTab('ANNOUNCEMENTS')}
-            className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all shrink-0 ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
               activeTab === 'ANNOUNCEMENTS'
                 ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-(--text-secondary) hover:text-(--text-primary)'
             }`}
           >
-            <Megaphone className="h-3.5 w-3.5" />
+            <Megaphone className="h-3.5 w-3.5 shrink-0" />
             <span>Announcements &amp; Ticker</span>
           </button>
 
           <button
             onClick={() => setActiveTab('DATES')}
-            className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all shrink-0 ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
               activeTab === 'DATES'
                 ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-(--text-secondary) hover:text-(--text-primary)'
             }`}
           >
-            <Calendar className="h-3.5 w-3.5" />
+            <Calendar className="h-3.5 w-3.5 shrink-0" />
             <span>Countdown &amp; Dates</span>
           </button>
 
           <button
             onClick={() => setActiveTab('HERO')}
-            className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all shrink-0 ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
               activeTab === 'HERO'
                 ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-(--text-secondary) hover:text-(--text-primary)'
             }`}
           >
-            <Sparkles className="h-3.5 w-3.5" />
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
             <span>Hero &amp; Branding</span>
           </button>
 
           <button
             onClick={() => setActiveTab('CONTACTS')}
-            className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all shrink-0 ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all shrink-0 whitespace-nowrap ${
               activeTab === 'CONTACTS'
                 ? 'bg-emerald-500 text-slate-950 shadow-sm'
                 : 'text-(--text-secondary) hover:text-(--text-primary)'
             }`}
           >
-            <Share2 className="h-3.5 w-3.5" />
+            <Share2 className="h-3.5 w-3.5 shrink-0" />
             <span>Contacts &amp; Socials</span>
           </button>
         </div>
@@ -348,7 +348,7 @@ export default function SiteConfigPage() {
         {activeTab === 'ANNOUNCEMENTS' && (
           <div className="space-y-6">
             {/* Live Interactive Preview Box */}
-            <div className="rounded-2xl border border-(--border-panel) bg-(--bg-panel) p-5 space-y-3 shadow-sm">
+            <div className="rounded-2xl border border-(--border-panel) bg-(--bg-panel) p-4 sm:p-5 space-y-3 shadow-sm">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-(--text-primary) uppercase tracking-wider">
                   Live Public Banner Preview
@@ -363,14 +363,14 @@ export default function SiteConfigPage() {
               </div>
 
               {/* Banner Simulation */}
-              <div className="rounded-xl overflow-hidden border border-emerald-500/20 bg-slate-950 p-3.5 shadow-inner">
+              <div className="rounded-xl overflow-hidden border border-emerald-500/30 bg-[#0F172A] p-3.5 shadow-inner">
                 {announcementEnabled ? (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-                    <div className="flex items-center gap-2 text-xs">
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-500 text-slate-950 text-[10px] font-bold font-mono">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-3 text-left">
+                    <div className="flex items-start sm:items-center gap-2 text-xs flex-1 min-w-0">
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-500 text-slate-950 text-[10px] font-bold font-mono shrink-0">
                         {announcementBadge}
                       </span>
-                      <span className="text-zinc-200 font-medium">{announcementText}</span>
+                      <span className="text-emerald-100 font-medium break-words">{announcementText}</span>
                     </div>
 
                     {announcementLink && (
@@ -378,7 +378,7 @@ export default function SiteConfigPage() {
                         href={announcementLink}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1 text-xs text-white font-semibold transition-colors shrink-0"
+                        className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 px-3 py-1 text-xs text-emerald-300 font-semibold transition-colors shrink-0 self-end sm:self-auto"
                       >
                         <span>Take Action</span>
                         <ExternalLink className="h-3 w-3" />
@@ -386,7 +386,7 @@ export default function SiteConfigPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="py-2 text-center text-xs text-zinc-500 font-medium">
+                  <div className="py-2 text-center text-xs text-zinc-400 font-medium">
                     (Announcement Banner is currently disabled and hidden from attendees)
                   </div>
                 )}

@@ -78,7 +78,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
       {/* Main Content Area */}
       <div
-        className={`flex flex-col min-h-screen transition-all duration-200 ${
+        className={`flex flex-col min-h-screen transition-all duration-200 min-w-0 w-full max-w-full overflow-x-hidden ${
           collapsed ? 'lg:pl-16' : 'lg:pl-60'
         }`}
       >
@@ -87,8 +87,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
           onMobileNavToggle={() => setMobileOpen((prev) => !prev)}
         />
 
-        <main className="flex-1 p-3.5 sm:p-4 lg:p-8">
-          <div className="mx-auto max-w-7xl">{children}</div>
+        <main className="flex-1 p-3 sm:p-4 lg:p-8 min-w-0 w-full max-w-full">
+          <div className="mx-auto max-w-7xl min-w-0 w-full">{children}</div>
         </main>
       </div>
 
