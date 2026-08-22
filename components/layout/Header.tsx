@@ -39,11 +39,14 @@ const ROLE_LABELS: Record<Role, { label: string; className: string }> = {
   DELEGATE: { label: 'User', className: 'text-(--text-muted) bg-(--bg-panel-alt) border-(--border-subtle)' },
 };
 
+let globalApiHealthy = true;
+let lastHealthCheckTime = 0;
+
 export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle }) => {
   const pathname = usePathname();
   const { role } = useAuth();
   const roleBadge = role ? ROLE_LABELS[role] : null;
-  const [isBackendHealthy, setIsBackendHealthy] = useState<boolean | null>(null);
+  const [isBackendHealthy, setIsBackendHealthy] = useState<boolean>(globalApiHealthy);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   const currentTitle = ROUTE_TITLES[pathname] || 'Control Console';
@@ -72,16 +75,27 @@ export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle 
     let timer: NodeJS.Timeout;
 
     const checkHealth = async () => {
+      // Throttle: don't re-check if checked within last 25 seconds
+      if (Date.now() - lastHealthCheckTime < 25000) {
+        if (mounted) setIsBackendHealthy(globalApiHealthy);
+        timer = setTimeout(checkHealth, 25000);
+        return;
+      }
+
       try {
         const h = await api.getHealth();
+        lastHealthCheckTime = Date.now();
+        globalApiHealthy = h.status === 'ok';
         if (mounted) {
-          setIsBackendHealthy(h.status === 'ok');
-          timer = setTimeout(checkHealth, 20000);
+          setIsBackendHealthy(globalApiHealthy);
+          timer = setTimeout(checkHealth, 30000);
         }
       } catch {
+        lastHealthCheckTime = Date.now();
+        globalApiHealthy = false;
         if (mounted) {
           setIsBackendHealthy(false);
-          timer = setTimeout(checkHealth, 5000);
+          timer = setTimeout(checkHealth, 10000);
         }
       }
     };

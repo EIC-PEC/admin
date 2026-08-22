@@ -22,15 +22,8 @@ import {
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api/v1';
 
-/**
- * Thrown by every ApiClient method on a network failure or non-2xx
- * response. Callers must catch this and surface it in the UI — this
- * client no longer silently substitutes mock data on failure, since
- * doing so let staff mistake fabricated numbers for live data.
- */
 export class ApiError extends Error {
   status?: number;
-  /** Parsed JSON error body, when the server returned one (e.g. NestJS exception filters). */
   body?: unknown;
 
   constructor(message: string, status?: number, body?: unknown) {
@@ -41,13 +34,11 @@ export class ApiError extends Error {
   }
 }
 
-/** Discriminated result of a QR scan at the gate. */
 export type VerifyQrResponse =
   | { outcome: 'SUCCESS'; result: CheckInSuccessResult }
   | { outcome: 'DUPLICATE'; conflict: CheckInConflictInfo }
   | { outcome: 'INVALID'; message: string };
 
-/** Discriminated result of a manual attendee lookup at the gate desk. */
 export type ManualLookupResponse =
   | { outcome: 'CHECKED_IN'; result: Registration }
   | { outcome: 'ALREADY_CHECKED_IN'; message: string }
@@ -59,36 +50,72 @@ async function parseBody(res: Response): Promise<unknown> {
 }
 
 function extractMessage(body: unknown, fallback: string): string {
-  const b = body as { message?: string | string[] } | null;
-  const msg = Array.isArray(b?.message) ? b?.message[0] : b?.message;
-  return msg || fallback;
+  if (!body) return fallback;
+  if (typeof body === 'string') return body;
+  if (typeof body === 'object') {
+    const rec = body as Record<string, unknown>;
+    if (typeof rec.message === 'string') return rec.message;
+    if (Array.isArray(rec.message) && rec.message.length > 0) {
+      return rec.message.map((m) => String(m)).join(', ');
+    }
+    if (typeof rec.error === 'string') return rec.error;
+  }
+  return fallback;
+}
+
+interface CacheItem<T> {
+  data: T;
+  timestamp: number;
+  ttlMs: number;
 }
 
 class ApiClient {
   private token: string | null = null;
   private isRefreshing = false;
+  private memoryCache = new Map<string, CacheItem<unknown>>();
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      this.token = sessionStorage.getItem('esummit_admin_token');
+    }
+  }
 
   setToken(token: string | null) {
     this.token = token;
+    if (typeof window !== 'undefined') {
+      if (token) {
+        sessionStorage.setItem('esummit_admin_token', token);
+      } else {
+        sessionStorage.removeItem('esummit_admin_token');
+      }
+    }
   }
 
   getToken(): string | null {
-    if (this.token) return this.token;
-    if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem('esummit_admin_token') || localStorage.getItem('esummit_admin_token');
-      if (stored) {
-        this.token = stored;
-        return stored;
-      }
+    if (!this.token && typeof window !== 'undefined') {
+      this.token = sessionStorage.getItem('esummit_admin_token');
     }
-    return null;
+    return this.token;
   }
 
   clearToken() {
     this.token = null;
+    this.invalidateCache();
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem('esummit_admin_token');
-      localStorage.removeItem('esummit_admin_token');
+    }
+  }
+
+  /** Invalidate in-memory cached responses matching a prefix or all */
+  invalidateCache(prefix?: string) {
+    if (!prefix) {
+      this.memoryCache.clear();
+      return;
+    }
+    for (const key of this.memoryCache.keys()) {
+      if (key.startsWith(prefix)) {
+        this.memoryCache.delete(key);
+      }
     }
   }
 
@@ -112,7 +139,7 @@ class ApiClient {
     let res: Response;
     try {
       res = await fetch(`${API_BASE}${path}`, {
-        credentials: 'include', // Sends HttpOnly refreshToken cookie
+        credentials: 'include',
         ...init,
         headers: { ...this.getHeaders(), ...(init?.headers || {}) },
       });
@@ -122,7 +149,6 @@ class ApiClient {
       );
     }
 
-    // Auto-refresh token on 401 (if not already an auth endpoint or retry)
     if (res.status === 401 && !isRetry && !path.startsWith('/auth/')) {
       const refreshed = await this.refreshSession();
       if (refreshed) {
@@ -146,6 +172,20 @@ class ApiClient {
     return (await res.json()) as T;
   }
 
+  /** Cached GET helper with in-memory TTL to avoid duplicate database calls on rapid navigation */
+  private async cachedGet<T>(path: string, ttlMs = 20000): Promise<T> {
+    const cached = this.memoryCache.get(path) as CacheItem<T> | undefined;
+    const now = Date.now();
+
+    if (cached && now - cached.timestamp < cached.ttlMs) {
+      return cached.data;
+    }
+
+    const freshData = await this.request<T>(path);
+    this.memoryCache.set(path, { data: freshData, timestamp: now, ttlMs });
+    return freshData;
+  }
+
   // ── Auth ──
   async login(
     email: string,
@@ -156,9 +196,7 @@ class ApiClient {
       body: JSON.stringify({ email, password }),
     });
     this.setToken(res.accessToken);
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('esummit_admin_token', res.accessToken);
-    }
+    this.invalidateCache();
     return res;
   }
 
@@ -175,9 +213,6 @@ class ApiClient {
         const data = await res.json();
         if (data?.accessToken) {
           this.setToken(data.accessToken);
-          if (typeof window !== 'undefined') {
-            sessionStorage.setItem('esummit_admin_token', data.accessToken);
-          }
           return true;
         }
       }
@@ -206,10 +241,9 @@ class ApiClient {
     return this.request<HealthStatus>('/health');
   }
 
-
   // ── Analytics ──
   async getAnalytics(): Promise<AnalyticsData> {
-    return this.request<AnalyticsData>('/admin/analytics');
+    return this.cachedGet<AnalyticsData>('/admin/analytics', 15000);
   }
 
   // ── Delegates ──
@@ -238,6 +272,7 @@ class ApiClient {
       `/admin/delegates/${registrationId}/override`,
       { method: 'PATCH' },
     );
+    this.invalidateCache('/admin/analytics');
     return { success: true, isCheckedIn: data.isCheckedIn };
   }
 
@@ -292,19 +327,13 @@ class ApiClient {
   }
 
   // ── QR Scanner & Manual Lookup ──
-  /**
-   * Verifies a signed QR token against POST /checkin/verify-qr. On a fresh
-   * pass this both validates AND performs the check-in server-side. Returns
-   * a discriminated outcome rather than throwing, since "already checked in"
-   * (409) and "invalid token" (400/404) are expected gate-desk outcomes, not
-   * client bugs.
-   */
   async verifyQr(qrToken: string, gateName = 'MAIN_GATE'): Promise<VerifyQrResponse> {
     try {
       const result = await this.request<CheckInSuccessResult>('/checkin/verify-qr', {
         method: 'POST',
         body: JSON.stringify({ qrToken, gateName }),
       });
+      this.invalidateCache('/admin/analytics');
       return { outcome: 'SUCCESS', result };
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
@@ -315,11 +344,6 @@ class ApiClient {
     }
   }
 
-  /**
-   * Browse mode: looks up attendees by name/email/phone/pass ID without
-   * checking anyone in. Returns the raw match list so the caller can let
-   * the volunteer confirm the exact person before check-in.
-   */
   async manualLookupSearch(query: string, gateName = 'MAIN_GATE'): Promise<ManualLookupResponse> {
     try {
       const data = await this.request<{ count: number; results: ManualLookupMatch[] }>(
@@ -333,16 +357,13 @@ class ApiClient {
     }
   }
 
-  /**
-   * Confirms check-in for one specific pass ID (an exact match, so the
-   * backend's "exactly one result" check-in branch fires).
-   */
   async manualCheckIn(passId: string, gateName = 'MAIN_GATE'): Promise<ManualLookupResponse> {
     try {
       const data = await this.request<{ status: string; attendee: Registration }>(
         '/checkin/manual-lookup',
         { method: 'POST', body: JSON.stringify({ query: passId, gateName, performCheckIn: true }) },
       );
+      this.invalidateCache('/admin/analytics');
       return { outcome: 'CHECKED_IN', result: data.attendee };
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
@@ -353,9 +374,6 @@ class ApiClient {
     }
   }
 
-  /**
-   * General manual lookup that performs either search or check-in based on performCheckIn flag.
-   */
   async manualLookup(query: string, gateName = 'MAIN_GATE', performCheckIn = false): Promise<ManualLookupResponse> {
     if (performCheckIn) {
       return this.manualCheckIn(query, gateName);
@@ -363,20 +381,20 @@ class ApiClient {
     return this.manualLookupSearch(query, gateName);
   }
 
-  /** Fetches gate check-in counts and recent scan stream */
   async getCheckInStats(): Promise<import('./types').CheckInStatsResponse> {
     return this.request<import('./types').CheckInStatsResponse>('/checkin/stats');
   }
 
   // ── CA Leaderboard ──
   async getCaLeaderboard(): Promise<CampusAmbassador[]> {
-    return this.request<CampusAmbassador[]>('/admin/ca-leaderboard');
+    return this.cachedGet<CampusAmbassador[]>('/admin/ca-leaderboard', 30000);
   }
 
   // ── Teams & Jury Scoring ──
   async getTeams(type?: CompetitionType): Promise<Team[]> {
-    return this.request<Team[]>(
+    return this.cachedGet<Team[]>(
       `/teams/leaderboard/${type || 'PITCH_COMPETITION'}`,
+      20000,
     );
   }
 
@@ -398,6 +416,7 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(scores),
     });
+    this.invalidateCache('/teams/leaderboard');
     return { success: true, team };
   }
 
@@ -412,80 +431,104 @@ class ApiClient {
     if (params?.track) query.set('track', params.track);
     if (params?.type) query.set('type', params.type);
     const qs = query.toString();
-    return this.request<EventItem[]>(`/events${qs ? `?${qs}` : ''}`);
+    return this.cachedGet<EventItem[]>(`/events${qs ? `?${qs}` : ''}`, 30000);
   }
 
   async createEvent(input: EventInput): Promise<EventItem> {
-    return this.request<EventItem>('/events', {
+    const res = await this.request<EventItem>('/events', {
       method: 'POST',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/events');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async updateEvent(id: string, input: Partial<EventInput>): Promise<EventItem> {
-    return this.request<EventItem>(`/events/${id}`, {
+    const res = await this.request<EventItem>(`/events/${id}`, {
       method: 'PUT',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/events');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async deleteEvent(id: string): Promise<void> {
     await this.request<void>(`/events/${id}`, { method: 'DELETE' });
+    this.invalidateCache('/events');
+    this.invalidateCache('/cms/bundle');
   }
 
   // ── CMS: Speakers ──
   async getSpeakers(): Promise<SpeakerItem[]> {
-    return this.request<SpeakerItem[]>('/speakers');
+    return this.cachedGet<SpeakerItem[]>('/speakers', 30000);
   }
 
   async createSpeaker(input: SpeakerInput): Promise<SpeakerItem> {
-    return this.request<SpeakerItem>('/speakers', {
+    const res = await this.request<SpeakerItem>('/speakers', {
       method: 'POST',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/speakers');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async updateSpeaker(
     id: string,
     input: Partial<SpeakerInput>,
   ): Promise<SpeakerItem> {
-    return this.request<SpeakerItem>(`/speakers/${id}`, {
+    const res = await this.request<SpeakerItem>(`/speakers/${id}`, {
       method: 'PUT',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/speakers');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async deleteSpeaker(id: string): Promise<void> {
     await this.request<void>(`/speakers/${id}`, { method: 'DELETE' });
+    this.invalidateCache('/speakers');
+    this.invalidateCache('/cms/bundle');
   }
 
   // ── CMS: Sponsors ──
   async getSponsors(): Promise<SponsorItem[]> {
-    return this.request<SponsorItem[]>('/sponsors');
+    return this.cachedGet<SponsorItem[]>('/sponsors', 30000);
   }
 
   async createSponsor(input: SponsorInput): Promise<SponsorItem> {
-    return this.request<SponsorItem>('/sponsors', {
+    const res = await this.request<SponsorItem>('/sponsors', {
       method: 'POST',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/sponsors');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async updateSponsor(id: string, input: Partial<SponsorInput>): Promise<SponsorItem> {
-    return this.request<SponsorItem>(`/sponsors/${id}`, {
+    const res = await this.request<SponsorItem>(`/sponsors/${id}`, {
       method: 'PUT',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/sponsors');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async deleteSponsor(id: string): Promise<void> {
     await this.request<void>(`/sponsors/${id}`, { method: 'DELETE' });
+    this.invalidateCache('/sponsors');
+    this.invalidateCache('/cms/bundle');
   }
 
   // ── CMS: Subscribers ──
   async getSubscribers(): Promise<import('./types').SubscriberItem[]> {
     try {
-      return await this.request<import('./types').SubscriberItem[]>('/subscribers');
+      return await this.cachedGet<import('./types').SubscriberItem[]>('/subscribers', 30000);
     } catch (err: any) {
       if (err?.status === 404) {
         return [];
@@ -496,109 +539,144 @@ class ApiClient {
 
   async deleteSubscriber(id: string): Promise<void> {
     await this.request<void>(`/subscribers/${id}`, { method: 'DELETE' });
+    this.invalidateCache('/subscribers');
   }
 
   // ── CMS: FAQs ──
   async getFaqs(category?: string): Promise<import('./types').FaqItem[]> {
     const qs = category && category !== 'All' ? `?category=${encodeURIComponent(category)}` : '';
-    return this.request<import('./types').FaqItem[]>(`/cms/faqs${qs}`);
+    return this.cachedGet<import('./types').FaqItem[]>(`/cms/faqs${qs}`, 30000);
   }
 
   async createFaq(input: import('./types').FaqInput): Promise<import('./types').FaqItem> {
-    return this.request<import('./types').FaqItem>('/cms/faqs', {
+    const res = await this.request<import('./types').FaqItem>('/cms/faqs', {
       method: 'POST',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/cms/faqs');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async updateFaq(id: string, input: Partial<import('./types').FaqInput>): Promise<import('./types').FaqItem> {
-    return this.request<import('./types').FaqItem>(`/cms/faqs/${id}`, {
+    const res = await this.request<import('./types').FaqItem>(`/cms/faqs/${id}`, {
       method: 'PUT',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/cms/faqs');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async deleteFaq(id: string): Promise<void> {
     await this.request<void>(`/cms/faqs/${id}`, { method: 'DELETE' });
+    this.invalidateCache('/cms/faqs');
+    this.invalidateCache('/cms/bundle');
   }
 
   // ── CMS: Alumni ──
   async getAlumni(): Promise<import('./types').AlumniItem[]> {
-    return this.request<import('./types').AlumniItem[]>('/alumni');
+    return this.cachedGet<import('./types').AlumniItem[]>('/alumni', 30000);
   }
 
   async createAlumni(input: import('./types').AlumniInput): Promise<import('./types').AlumniItem> {
-    return this.request<import('./types').AlumniItem>('/alumni', {
+    const res = await this.request<import('./types').AlumniItem>('/alumni', {
       method: 'POST',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/alumni');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async updateAlumni(id: string, input: Partial<import('./types').AlumniInput>): Promise<import('./types').AlumniItem> {
-    return this.request<import('./types').AlumniItem>(`/alumni/${id}`, {
+    const res = await this.request<import('./types').AlumniItem>(`/alumni/${id}`, {
       method: 'PUT',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/alumni');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async deleteAlumni(id: string): Promise<void> {
     await this.request<void>(`/alumni/${id}`, { method: 'DELETE' });
+    this.invalidateCache('/alumni');
+    this.invalidateCache('/cms/bundle');
   }
 
   // ── CMS: Gallery ──
   async getGallery(): Promise<import('./types').GalleryItem[]> {
-    return this.request<import('./types').GalleryItem[]>('/gallery');
+    return this.cachedGet<import('./types').GalleryItem[]>('/gallery', 30000);
   }
 
   async createGalleryItem(input: import('./types').GalleryInput): Promise<import('./types').GalleryItem> {
-    return this.request<import('./types').GalleryItem>('/gallery', {
+    const res = await this.request<import('./types').GalleryItem>('/gallery', {
       method: 'POST',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/gallery');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async deleteGalleryItem(id: string): Promise<void> {
     await this.request<void>(`/gallery/${id}`, { method: 'DELETE' });
+    this.invalidateCache('/gallery');
+    this.invalidateCache('/cms/bundle');
   }
 
   // ── CMS: Portfolio Events Media ──
   async getPortfolioMedia(): Promise<import('./types').PortfolioEventMedia[]> {
-    return this.request<import('./types').PortfolioEventMedia[]>('/portfolio-events');
+    return this.cachedGet<import('./types').PortfolioEventMedia[]>('/portfolio-events', 30000);
   }
 
   async setPortfolioImage(eventId: string, imageUrl: string): Promise<import('./types').PortfolioEventMedia> {
-    return this.request<import('./types').PortfolioEventMedia>('/portfolio-events', {
+    const res = await this.request<import('./types').PortfolioEventMedia>('/portfolio-events', {
       method: 'POST',
       body: JSON.stringify({ eventId, imageUrl }),
     });
+    this.invalidateCache('/portfolio-events');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async deletePortfolioImage(eventId: string): Promise<void> {
     await this.request<void>(`/portfolio-events/${eventId}`, { method: 'DELETE' });
+    this.invalidateCache('/portfolio-events');
+    this.invalidateCache('/cms/bundle');
   }
 
   // ── CMS: Schedule Items (Day 1 & Day 2 Timeline) ──
   async getScheduleItems(day?: number): Promise<import('./types').ScheduleItem[]> {
     const query = day !== undefined ? `?day=${day}` : '';
-    return this.request<import('./types').ScheduleItem[]>(`/cms/schedule${query}`);
+    return this.cachedGet<import('./types').ScheduleItem[]>(`/cms/schedule${query}`, 30000);
   }
 
   async createScheduleItem(input: import('./types').ScheduleItemInput): Promise<import('./types').ScheduleItem> {
-    return this.request<import('./types').ScheduleItem>('/cms/schedule', {
+    const res = await this.request<import('./types').ScheduleItem>('/cms/schedule', {
       method: 'POST',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/cms/schedule');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async updateScheduleItem(id: string, input: Partial<import('./types').ScheduleItemInput>): Promise<import('./types').ScheduleItem> {
-    return this.request<import('./types').ScheduleItem>(`/cms/schedule/${id}`, {
+    const res = await this.request<import('./types').ScheduleItem>(`/cms/schedule/${id}`, {
       method: 'PUT',
       body: JSON.stringify(input),
     });
+    this.invalidateCache('/cms/schedule');
+    this.invalidateCache('/cms/bundle');
+    return res;
   }
 
   async deleteScheduleItem(id: string): Promise<void> {
     await this.request<void>(`/cms/schedule/${id}`, { method: 'DELETE' });
+    this.invalidateCache('/cms/schedule');
+    this.invalidateCache('/cms/bundle');
   }
 
   // ── CMS: Bundle ──
@@ -612,19 +690,21 @@ class ApiClient {
     portfolioMedia?: import('./types').PortfolioEventMedia[];
     faqs?: import('./types').FaqItem[];
   }> {
-    return this.request('/cms/bundle');
+    return this.cachedGet('/cms/bundle', 30000);
   }
 
   // ── Global SiteConfig & Live Announcements ──
   async getSiteConfig(): Promise<SiteConfig> {
-    return this.request('/cms/site-config');
+    return this.cachedGet('/cms/site-config', 30000);
   }
 
   async updateSiteConfig(dto: SiteConfigInput): Promise<SiteConfig> {
-    return this.request('/cms/site-config', {
+    const res = await this.request<SiteConfig>('/cms/site-config', {
       method: 'PUT',
       body: JSON.stringify(dto),
     });
+    this.invalidateCache('/cms/site-config');
+    return res;
   }
 
   // ── Storage / Cloudflare R2 Upload ──
