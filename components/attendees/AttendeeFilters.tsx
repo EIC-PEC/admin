@@ -23,9 +23,9 @@ export const AttendeeFilters: React.FC<AttendeeFiltersProps> = ({
   setStatusFilter,
 }) => {
   return (
-    <div className="flex flex-col md:flex-row items-center gap-2.5">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
       <form onSubmit={handleSearchSubmit} className="flex-1 w-full relative">
-        <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-(--text-muted)" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-(--text-muted)" />
         <input
           type="text"
           placeholder="Search by attendee name, email, or pass ID..."
@@ -35,12 +35,12 @@ export const AttendeeFilters: React.FC<AttendeeFiltersProps> = ({
         />
       </form>
 
-      <div className="flex items-center gap-2 w-full md:w-auto">
+      <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
         {/* Pass Type Filter */}
         <select
           value={passFilter}
           onChange={(e) => setPassFilter(e.target.value)}
-          className="rounded-lg border border-(--border-panel) bg-(--bg-panel-alt) py-2 px-3 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none cursor-pointer"
+          className="w-full sm:w-auto rounded-lg border border-(--border-panel) bg-(--bg-panel-alt) py-2 px-3 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none cursor-pointer truncate"
         >
           <option value="ALL">All Pass Tiers</option>
           <option value="STUDENT_GENERAL">Student General</option>
@@ -53,7 +53,7 @@ export const AttendeeFilters: React.FC<AttendeeFiltersProps> = ({
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-(--border-panel) bg-(--bg-panel-alt) py-2 px-3 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none cursor-pointer"
+          className="w-full sm:w-auto rounded-lg border border-(--border-panel) bg-(--bg-panel-alt) py-2 px-3 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none cursor-pointer truncate"
         >
           <option value="ALL">All Gate Statuses</option>
           <option value="CHECKED_IN">Checked In</option>
