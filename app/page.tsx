@@ -14,14 +14,17 @@ import { AppShell } from '../components/layout/AppShell';
 import { StatCard } from '../components/ui/StatCard';
 import { Badge } from '../components/ui/Badge';
 import { api } from '../lib/api';
+import { useAuth } from '../lib/auth-context';
 import { AnalyticsData } from '../lib/types';
 
 export default function DashboardHome() {
+  const { isAuthenticated } = useAuth();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
+    if (!isAuthenticated) return;
     setRefreshing(true);
     try {
       const res = await api.getAnalytics();
@@ -32,13 +35,14 @@ export default function DashboardHome() {
       setRefreshing(false);
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     loadData();
     const interval = setInterval(loadData, 20000);
     return () => clearInterval(interval);
-  }, [loadData]);
+  }, [loadData, isAuthenticated]);
 
   const overview = data?.overview || {
     totalDelegates: 0,

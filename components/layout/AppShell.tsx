@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Search, X } from 'lucide-react';
 import { api } from '../../lib/api';
+import { useAuth } from '../../lib/auth-context';
 import { Registration } from '../../lib/types';
 import { Badge } from '../ui/Badge';
 
@@ -13,12 +15,21 @@ interface AppShellProps {
 }
 
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
+  const { user, isLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
+
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Registration[]>([]);
   const [searching, setSearching] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isLoading, isAuthenticated, router]);
 
   const handleSearch = async (q: string) => {
     setSearchQuery(q);
@@ -31,6 +42,21 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
     setSearchResults(data.items);
     setSearching(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-(--bg-void) flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-7 w-7 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+          <span className="text-xs text-neutral-400 font-mono">Authenticating Console Access...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-(--bg-void) text-(--text-primary) transition-colors duration-200">
