@@ -29,10 +29,13 @@ const ROUTE_TITLES: Record<string, string> = {
 };
 
 const ROLE_LABELS: Record<Role, { label: string; className: string }> = {
+  ADMIN: { label: 'Admin', className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25 font-semibold' },
   SUPER_ADMIN: { label: 'Admin', className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25 font-semibold' },
   ORGANIZER: { label: 'Admin', className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25 font-semibold' },
+  GATE: { label: 'Gate', className: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/25 font-semibold' },
   VOLUNTEER_CHECKIN: { label: 'Gate', className: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/25 font-semibold' },
   INVESTOR: { label: 'Admin', className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25 font-semibold' },
+  USER: { label: 'User', className: 'text-(--text-muted) bg-(--bg-panel-alt) border-(--border-subtle)' },
   DELEGATE: { label: 'User', className: 'text-(--text-muted) bg-(--bg-panel-alt) border-(--border-subtle)' },
 };
 

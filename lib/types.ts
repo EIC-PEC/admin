@@ -1,16 +1,18 @@
-export type Role = 'SUPER_ADMIN' | 'ORGANIZER' | 'VOLUNTEER_CHECKIN' | 'INVESTOR' | 'DELEGATE';
+export type Role = 'ADMIN' | 'GATE' | 'USER' | 'SUPER_ADMIN' | 'ORGANIZER' | 'VOLUNTEER_CHECKIN' | 'INVESTOR' | 'DELEGATE';
 
-export const HUMAN_ROLE_NAMES: Record<Role, string> = {
+export const HUMAN_ROLE_NAMES: Record<string, string> = {
+  ADMIN: 'Admin',
   SUPER_ADMIN: 'Admin',
   ORGANIZER: 'Admin',
+  GATE: 'Gate',
   VOLUNTEER_CHECKIN: 'Gate',
-  INVESTOR: 'Admin',
+  USER: 'User',
   DELEGATE: 'User',
 };
 
 export function formatHumanRole(role?: Role | string | null): string {
   if (!role) return 'Admin';
-  return HUMAN_ROLE_NAMES[role as Role] || 'Admin';
+  return HUMAN_ROLE_NAMES[role] || 'Admin';
 }
 
 export type PassType = 
