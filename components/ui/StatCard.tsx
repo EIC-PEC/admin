@@ -29,82 +29,72 @@ export const StatCard: React.FC<StatCardProps> = ({
 }) => {
   const displayBadge = badge || accentBadge;
 
-  const variantConfig: Record<string, { cardBg: string; iconBg: string; badgeBg: string; subColor: string }> = {
+  const variantConfig: Record<string, { iconBg: string; badgeBg: string; valueColor: string }> = {
     mint: {
-      cardBg: 'bg-[#4ADE80] text-slate-950', // Solid Vibrant Lime Green
-      iconBg: 'bg-black/15 text-slate-950 border border-black/10',
-      badgeBg: 'bg-black/15 text-slate-950 border border-black/10',
-      subColor: 'text-slate-800',
+      iconBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+      badgeBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+      valueColor: 'text-(--text-primary)',
     },
     emerald: {
-      cardBg: 'bg-[#4ADE80] text-slate-950',
-      iconBg: 'bg-black/15 text-slate-950 border border-black/10',
-      badgeBg: 'bg-black/15 text-slate-950 border border-black/10',
-      subColor: 'text-slate-800',
+      iconBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+      badgeBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+      valueColor: 'text-(--text-primary)',
     },
     cyan: {
-      cardBg: 'bg-[#38BDF8] text-slate-950', // Solid Vibrant Sky Blue
-      iconBg: 'bg-black/15 text-slate-950 border border-black/10',
-      badgeBg: 'bg-black/15 text-slate-950 border border-black/10',
-      subColor: 'text-slate-800',
+      iconBg: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20',
+      badgeBg: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20',
+      valueColor: 'text-(--text-primary)',
     },
     blue: {
-      cardBg: 'bg-[#38BDF8] text-slate-950', // Solid Vibrant Sky Blue
-      iconBg: 'bg-black/15 text-slate-950 border border-black/10',
-      badgeBg: 'bg-black/15 text-slate-950 border border-black/10',
-      subColor: 'text-slate-800',
+      iconBg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20',
+      badgeBg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20',
+      valueColor: 'text-(--text-primary)',
     },
     coral: {
-      cardBg: 'bg-[#FB923C] text-slate-950', // Solid Vibrant Coral Orange
-      iconBg: 'bg-black/15 text-slate-950 border border-black/10',
-      badgeBg: 'bg-black/15 text-slate-950 border border-black/10',
-      subColor: 'text-slate-800',
+      iconBg: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20',
+      badgeBg: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20',
+      valueColor: 'text-(--text-primary)',
     },
     gold: {
-      cardBg: 'bg-[#FDE047] text-slate-950', // Solid Vibrant Canary Yellow
-      iconBg: 'bg-black/15 text-slate-950 border border-black/10',
-      badgeBg: 'bg-black/15 text-slate-950 border border-black/10',
-      subColor: 'text-slate-800',
+      iconBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
+      badgeBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
+      valueColor: 'text-(--text-primary)',
     },
     amber: {
-      cardBg: 'bg-[#FDE047] text-slate-950',
-      iconBg: 'bg-black/15 text-slate-950 border border-black/10',
-      badgeBg: 'bg-black/15 text-slate-950 border border-black/10',
-      subColor: 'text-slate-800',
+      iconBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
+      badgeBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
+      valueColor: 'text-(--text-primary)',
     },
     purple: {
-      cardBg: 'bg-[#C084FC] text-slate-950', // Solid Vibrant Lilac Purple
-      iconBg: 'bg-black/15 text-slate-950 border border-black/10',
-      badgeBg: 'bg-black/15 text-slate-950 border border-black/10',
-      subColor: 'text-slate-800',
+      iconBg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20',
+      badgeBg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20',
+      valueColor: 'text-(--text-primary)',
     },
   };
 
   const current = variantConfig[variant] || variantConfig.mint;
 
   return (
-    <div
-      className={`relative overflow-hidden rounded-[4px] p-5 transition-transform duration-150 hover:scale-[1.01] ${current.cardBg}`}
-    >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-900">{title}</p>
-          <h3 className="mt-2 text-2xl lg:text-3xl font-extrabold tracking-tight font-rajdhani text-slate-950">
+    <div className="relative overflow-hidden rounded-xl border border-(--border-panel) bg-(--bg-panel) p-4 sm:p-5 transition-all duration-150 hover:border-(--border-panel-elevated) shadow-sm space-y-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-(--text-muted)">{title}</p>
+          <h3 className="mt-1 text-2xl lg:text-3xl font-bold tracking-tight text-(--text-primary)">
             {value}
           </h3>
           {subtitle && (
-            <p className={`mt-1 text-xs font-semibold ${current.subColor}`}>{subtitle}</p>
+            <p className="mt-1 text-xs text-(--text-secondary) truncate">{subtitle}</p>
           )}
         </div>
-        <div className={`flex h-11 w-11 items-center justify-center rounded-[4px] ${current.iconBg}`}>
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${current.iconBg}`}>
           <Icon className="h-5 w-5" />
         </div>
       </div>
 
       {(trend || displayBadge) && (
-        <div className="mt-4 flex items-center justify-between border-t border-black/10 pt-3 text-xs">
+        <div className="flex items-center justify-between border-t border-(--border-subtle) pt-2.5 text-xs">
           {trend ? (
-            <span className="font-extrabold text-slate-950">
+            <span className={`font-semibold ${trend.positive ? 'text-emerald-500' : 'text-rose-500'}`}>
               {trend.positive ? '↑' : '↓'} {trend.value}
             </span>
           ) : (
@@ -112,7 +102,7 @@ export const StatCard: React.FC<StatCardProps> = ({
           )}
 
           {displayBadge && (
-            <span className={`text-[11px] px-2 py-0.5 rounded-[4px] font-extrabold tracking-wide uppercase ${current.badgeBg}`}>
+            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${current.badgeBg}`}>
               {displayBadge}
             </span>
           )}

@@ -34,49 +34,49 @@ const NAV_ITEMS: NavItem[] = [
     name: 'Dashboard',
     href: '/',
     icon: LayoutDashboard,
-    roles: ['SUPER_ADMIN', 'ORGANIZER', 'VOLUNTEER_CHECKIN'],
+    roles: ['ADMIN', 'GATE', 'SUPER_ADMIN', 'ORGANIZER', 'VOLUNTEER_CHECKIN'] as any,
   },
   {
     name: 'Attendees & Passes',
     href: '/attendees',
     icon: Users,
-    roles: ['SUPER_ADMIN', 'ORGANIZER', 'VOLUNTEER_CHECKIN'],
+    roles: ['ADMIN', 'GATE', 'SUPER_ADMIN', 'ORGANIZER', 'VOLUNTEER_CHECKIN'] as any,
   },
   {
     name: 'Content & Schedule',
     href: '/cms',
     icon: CalendarDays,
-    roles: ['SUPER_ADMIN', 'ORGANIZER'],
+    roles: ['ADMIN', 'SUPER_ADMIN', 'ORGANIZER'] as any,
   },
   {
     name: 'Media & Showcase',
     href: '/media',
     icon: FolderGit2,
-    roles: ['SUPER_ADMIN', 'ORGANIZER'],
+    roles: ['ADMIN', 'SUPER_ADMIN', 'ORGANIZER'] as any,
   },
   {
     name: 'Alumni Directory',
     href: '/alumni',
     icon: GraduationCap,
-    roles: ['SUPER_ADMIN', 'ORGANIZER'],
+    roles: ['ADMIN', 'SUPER_ADMIN', 'ORGANIZER'] as any,
   },
   {
     name: 'Subscribers List',
     href: '/subscribers',
     icon: Mail,
-    roles: ['SUPER_ADMIN', 'ORGANIZER'],
+    roles: ['ADMIN', 'SUPER_ADMIN', 'ORGANIZER'] as any,
   },
   {
     name: 'Site Config & Alerts',
     href: '/config',
     icon: Sliders,
-    roles: ['SUPER_ADMIN', 'ORGANIZER'],
+    roles: ['ADMIN', 'SUPER_ADMIN', 'ORGANIZER'] as any,
   },
   {
     name: 'Security & Audit Logs',
     href: '/audit',
     icon: ShieldCheck,
-    roles: ['SUPER_ADMIN', 'ORGANIZER'],
+    roles: ['ADMIN', 'SUPER_ADMIN', 'ORGANIZER'] as any,
   },
 ];
 
@@ -98,7 +98,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const collapsed = externalCollapsed !== undefined ? externalCollapsed : internalCollapsed;
   const setCollapsed = externalSetCollapsed || setInternalCollapsed;
   const { role, logout, user } = useAuth();
-  const accessibleNav = NAV_ITEMS.filter((item) => (role ? item.roles.includes(role) : false));
+  const currentRole = role || (user?.role as any) || 'ADMIN';
+  const accessibleNav = NAV_ITEMS.filter((item) =>
+    currentRole ? item.roles.includes(currentRole as any) : true
+  );
 
   const handleLinkClick = () => {
     if (setMobileOpen) {
