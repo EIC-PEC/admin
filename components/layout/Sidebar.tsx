@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="shrink-0 flex h-16 items-center justify-between px-3.5 border-b border-(--border-subtle) bg-(--bg-panel)">
         <Link href="/" onClick={handleLinkClick} className={`flex flex-col truncate group ${collapsed ? 'lg:hidden' : ''}`}>
           <span className="font-bold text-sm text-(--text-primary) leading-tight tracking-tight">
-            PEC E-Summit '26
+            PEC E-Summit &apos;26
           </span>
           <span className="text-[10px] text-emerald-500 uppercase tracking-wider font-semibold">
             Admin Console

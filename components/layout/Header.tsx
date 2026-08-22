@@ -4,10 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { 
   Search, 
-  ExternalLink,
-  Sun,
-  Moon,
-  Menu,
+  Sun, 
+  Moon, 
+  Menu 
 } from 'lucide-react';
 import { useAuth } from '../../lib/auth-context';
 import { Role } from '../../lib/types';
@@ -37,7 +36,7 @@ const ROLE_LABELS: Record<Role, { label: string; className: string }> = {
 
 export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle }) => {
   const pathname = usePathname();
-  const { role, user } = useAuth();
+  const { role } = useAuth();
   const roleBadge = role ? ROLE_LABELS[role] : null;
   const [isBackendHealthy, setIsBackendHealthy] = useState<boolean | null>(null);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -45,12 +44,10 @@ export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle 
   const currentTitle = ROUTE_TITLES[pathname] || 'Control Console';
 
   useEffect(() => {
-    const current = (typeof window !== 'undefined' ? localStorage.getItem('esummit_admin_theme') : 'dark') as 'dark' | 'light' || 'dark';
-    setTheme(current);
-    if (typeof document !== 'undefined') {
-      document.documentElement.classList.remove('light', 'dark');
-      document.documentElement.classList.add(current);
-    }
+    const saved = localStorage.getItem('esummit_admin_theme') as 'dark' | 'light' | null;
+    const initial = saved || 'dark';
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(initial);
   }, []);
 
   const toggleTheme = () => {
