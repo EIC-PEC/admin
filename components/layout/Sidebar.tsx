@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 import { useAuth } from '../../lib/auth-context';
-import { Role } from '../../lib/types';
+import { Role, formatHumanRole } from '../../lib/types';
 
 interface NavItem {
   name: string;
@@ -252,8 +252,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <span className="text-xs font-bold text-(--text-primary) truncate">
                   {user?.name || 'Super Admin'}
                 </span>
-                <span className="text-[10px] text-(--text-muted) truncate uppercase tracking-wider font-mono">
-                  {(role || 'SUPER_ADMIN').replace('_', ' ')}
+                <span className="text-[10px] text-(--text-muted) truncate font-medium">
+                  {formatHumanRole(role)}
                 </span>
               </div>
             </div>

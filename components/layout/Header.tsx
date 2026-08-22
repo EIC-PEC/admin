@@ -29,11 +29,11 @@ const ROUTE_TITLES: Record<string, string> = {
 };
 
 const ROLE_LABELS: Record<Role, { label: string; className: string }> = {
-  SUPER_ADMIN: { label: 'Super Admin', className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
-  ORGANIZER: { label: 'Organizer', className: 'text-sky-600 dark:text-sky-400 bg-sky-500/10 border-sky-500/20' },
-  VOLUNTEER_CHECKIN: { label: 'Gate Volunteer', className: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20' },
-  INVESTOR: { label: 'Judge / Investor', className: 'text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20' },
-  DELEGATE: { label: 'Attendee', className: 'text-(--text-secondary) bg-(--bg-panel-alt) border-(--border-subtle)' },
+  SUPER_ADMIN: { label: 'Super Admin', className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25' },
+  ORGANIZER: { label: 'Organizer', className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25' },
+  VOLUNTEER_CHECKIN: { label: 'Gate Volunteer', className: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/25' },
+  INVESTOR: { label: 'Jury / Investor', className: 'text-sky-600 dark:text-sky-400 bg-sky-500/10 border-sky-500/25' },
+  DELEGATE: { label: 'Attendee', className: 'text-(--text-muted) bg-(--bg-panel-alt) border-(--border-subtle)' },
 };
 
 export const Header: React.FC<HeaderProps> = ({ onSearchOpen, onMobileNavToggle }) => {
