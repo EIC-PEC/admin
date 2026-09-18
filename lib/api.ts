@@ -139,6 +139,7 @@ class ApiClient {
     let res: Response;
     try {
       res = await fetch(`${API_BASE}${path}`, {
+        cache: 'no-store',
         credentials: 'include',
         ...init,
         headers: { ...this.getHeaders(), ...(init?.headers || {}) },
