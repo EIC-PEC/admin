@@ -48,11 +48,11 @@ export default function LoginPage() {
       <div className="w-full max-w-sm space-y-6 relative z-10">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-[4px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
-            <ShieldCheck className="h-5 w-5" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-lg bg-teal-500/10 border border-teal-500/20 p-2">
+            <img src="/esummit-mark.png" alt="E-Summit Logo" className="h-full w-full object-contain drop-shadow-[0_0_12px_rgba(0,245,212,0.4)]" />
           </div>
-          <div className="inline-flex items-center gap-1.5 rounded-[4px] bg-(--bg-panel-alt) px-2.5 py-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 border border-(--border-subtle)">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 rounded-[4px] bg-(--bg-panel-alt) px-2.5 py-1 text-[11px] font-semibold text-teal-400 border border-(--border-subtle)">
+            <span className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse" />
             ADMIN CONSOLE
           </div>
           <h1 className="text-xl font-bold tracking-tight text-(--text-primary) font-rajdhani">

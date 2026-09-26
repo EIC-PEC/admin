@@ -14,9 +14,9 @@ export const metadata: Metadata = {
   title: 'PEC E-Summit 2026 | Operations Hub',
   description: 'Operations Portal, Delegate Registry & CMS for PEC E-Summit 2026',
   icons: {
-    icon: '/eic-logo.png',
-    shortcut: '/eic-logo.png',
-    apple: '/eic-logo.png',
+    icon: '/esummit-mark.png',
+    shortcut: '/esummit-mark.png',
+    apple: '/icon-192.png',
   },
 };
 

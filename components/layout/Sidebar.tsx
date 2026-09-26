@@ -121,13 +121,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     >
       {/* Top Header & Toggle */}
       <div className="shrink-0 flex h-16 items-center justify-between px-3.5 border-b border-(--border-subtle) bg-(--bg-panel)">
-        <Link href="/" onClick={handleLinkClick} className={`flex flex-col truncate group ${collapsed ? 'lg:hidden' : ''}`}>
-          <span className="font-bold text-sm text-(--text-primary) leading-tight tracking-tight">
-            PEC E-Summit &apos;26
-          </span>
-          <span className="text-[10px] text-emerald-500 uppercase tracking-wider font-semibold">
-            Admin Console
-          </span>
+        <Link href="/" onClick={handleLinkClick} className={`flex items-center gap-2.5 truncate group ${collapsed ? 'lg:hidden' : ''}`}>
+          <img
+            src="/esummit-mark.png"
+            alt="E-Summit Logo"
+            className="h-8 w-8 object-contain rounded-sm shrink-0 drop-shadow-[0_0_8px_rgba(0,245,212,0.3)]"
+          />
+          <div className="flex flex-col truncate">
+            <span className="font-bold text-sm text-(--text-primary) leading-tight tracking-tight">
+              PEC E-Summit &apos;26
+            </span>
+            <span className="text-[10px] text-teal-400 uppercase tracking-wider font-semibold">
+              Admin Console
+            </span>
+          </div>
         </Link>
 
         {/* Mobile Close Button */}
