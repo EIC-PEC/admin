@@ -63,7 +63,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: 'jwt' },
   pages: { signIn: '/login' },
-  trustHost: true,
+  trustHost: Boolean(process.env.AUTH_TRUST_HOST || process.env.NODE_ENV !== 'production'),
 
   providers: [
     Credentials({
