@@ -19,12 +19,18 @@ export function CmsModal({ open, isOpen, onClose, title, subtitle, icon, accentC
   if (!isVisible) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-sm overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-sm overflow-y-auto cursor-pointer"
       role="dialog"
       aria-modal="true"
       aria-labelledby="cms-modal-title"
     >
-      <div className="w-full max-w-lg max-h-[92vh] flex flex-col rounded-[6px] bg-(--bg-panel) shadow-2xl border border-(--border-panel) overflow-hidden my-auto">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-lg max-h-[92vh] flex flex-col rounded-[6px] bg-(--bg-panel) shadow-2xl border border-(--border-panel) overflow-hidden my-auto cursor-default"
+      >
         {/* Modal Sticky Header */}
         <div className="flex items-center justify-between border-b border-(--border-subtle) px-5 py-3.5 bg-(--bg-panel) shrink-0">
           <div className="flex items-center gap-2.5">

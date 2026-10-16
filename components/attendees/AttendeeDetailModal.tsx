@@ -18,8 +18,16 @@ export const AttendeeDetailModal: React.FC<AttendeeDetailModalProps> = ({
   if (!delegate) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-      <div className="relative w-full max-w-sm rounded-2xl border border-(--border-panel) bg-(--bg-panel) p-5 shadow-2xl space-y-4">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm cursor-pointer"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-sm rounded-2xl border border-(--border-panel) bg-(--bg-panel) p-5 shadow-2xl space-y-4 cursor-default"
+      >
         <button
           onClick={onClose}
           className="absolute right-3.5 top-3.5 rounded-lg p-1 text-(--text-muted) hover:bg-(--bg-panel-alt) hover:text-(--text-primary) transition-colors cursor-pointer"
