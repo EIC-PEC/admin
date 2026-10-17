@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, Trophy, Users, Award, Mic } from 'lucide-react';
+import { Trophy, Users, Award, Mic } from 'lucide-react';
 
 interface HeroStatsTabProps {
   heroTitle: string;

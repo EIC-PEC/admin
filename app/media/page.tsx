@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Loader2, Image, Sparkles, Building2, Layers } from 'lucide-react';
+import { Loader2, Image, Building2, Layers } from 'lucide-react';
 import { AppShell } from '../../components/layout/AppShell';
 import { GalleryItem, PortfolioEventMedia, SponsorItem } from '../../lib/types';
 import { api, ApiError } from '../../lib/api';
@@ -62,7 +62,7 @@ export default function MediaUploadCenterPage() {
                   : 'text-(--text-secondary) hover:text-(--text-primary)'
               }`}
             >
-              <Sparkles className="h-3.5 w-3.5 shrink-0" />
+              <Image className="h-3.5 w-3.5 shrink-0" />
               <span>Showcase ({gallery.length}/16)</span>
             </button>
             <button

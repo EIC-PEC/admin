@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Megaphone, 
   Calendar, 
-  Sparkles, 
+  Layers, 
   Share2, 
   Save, 
   RefreshCw, 
@@ -235,7 +235,7 @@ export default function SiteConfigPage() {
           {[
             { id: 'ANNOUNCEMENTS', label: 'Announcement Ticker', icon: Megaphone },
             { id: 'DATES', label: 'Dates & Venue', icon: Calendar },
-            { id: 'HERO', label: 'Hero & Counters', icon: Sparkles },
+            { id: 'HERO', label: 'Hero & Counters', icon: Layers },
             { id: 'CONTACTS', label: 'Contacts & Socials', icon: Share2 },
           ].map((tab) => {
             const Icon = tab.icon;

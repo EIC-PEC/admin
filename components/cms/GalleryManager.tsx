@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Trash2, Pencil, ImagePlus, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Pencil, ImagePlus } from 'lucide-react';
 import { ImageDropzone } from '../ui/ImageDropzone';
 import { CmsModal } from './CmsModal';
 import { GalleryItem, GalleryInput } from '../../lib/types';

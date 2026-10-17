@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { MapPin, Navigation, Sparkles } from 'lucide-react';
+import { MapPin, Navigation } from 'lucide-react';
 
 interface VenueLocationPickerProps {
   lat: number;
@@ -191,7 +191,7 @@ export function VenueLocationPicker({
       {/* Quick Select Preset Buttons */}
       <div className="space-y-1.5">
         <span className="text-[10px] font-bold uppercase tracking-wider text-(--text-muted) flex items-center gap-1">
-          <Sparkles className="h-3 w-3 text-emerald-500" /> Quick Select Campus Venue:
+          Quick Select Campus Venue:
         </span>
         <div className="flex flex-wrap gap-1.5">
           {PEC_LANDMARKS.map((lm) => {

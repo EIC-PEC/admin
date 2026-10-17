@@ -9,8 +9,7 @@ import {
   ChevronDown, 
   ChevronUp, 
   Search, 
-  Tag, 
-  Sparkles 
+  Tag 
 } from 'lucide-react';
 import { CmsModal } from './CmsModal';
 import { FaqItem, FaqInput } from '../../lib/types';

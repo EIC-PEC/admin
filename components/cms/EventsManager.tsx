@@ -11,7 +11,6 @@ import {
   Tag, 
   Users, 
   Layers,
-  Sparkles,
   MapPin
 } from 'lucide-react';
 import { ImageDropzone } from '../ui/ImageDropzone';

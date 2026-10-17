@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Trash2, Pencil, GraduationCap, ExternalLink, Sparkles, Award } from 'lucide-react';
+import { Plus, Trash2, Pencil, GraduationCap, ExternalLink, Award } from 'lucide-react';
 
 import { ImageDropzone } from '../ui/ImageDropzone';
 import { CmsModal } from './CmsModal';
@@ -179,7 +179,6 @@ export function AlumniManager({ alumni, onAlumniChange }: Props) {
 
                 {alm.valuation && (
                   <div className="px-2.5 py-1 rounded-lg bg-emerald-500/7 border border-emerald-500/20 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
-                    <Sparkles className="h-3 w-3 shrink-0" />
                     <span>{alm.valuation}</span>
                   </div>
                 )}
