@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, Navigation } from 'lucide-react';
+import { KNOWN_VENUES } from '../../lib/constants';
 
 interface VenueLocationPickerProps {
   lat: number;
@@ -11,15 +12,12 @@ interface VenueLocationPickerProps {
   onChange: (coords: { lat: number; lng: number; venueName?: string; building?: string }) => void;
 }
 
-const PEC_LANDMARKS = [
-  { name: 'Main Auditorium', building: 'CCA Building', lat: 30.765515, lng: 76.784260 },
-  { name: 'Senate Hall', building: 'PEC Senate Hall', lat: 30.767000, lng: 76.787200 },
-  { name: 'Siemens CoE', building: 'Siemens Center of Excellence', lat: 30.768200, lng: 76.789000 },
-  { name: 'Expo Hall', building: 'SPIC Centre', lat: 30.765833, lng: 76.785850 },
-  { name: 'Main Gate (Gate 1)', building: 'Campus Entrance', lat: 30.763153, lng: 76.783675 },
-  { name: 'Student Center', building: 'PEC Market Area', lat: 30.766326, lng: 76.783485 },
-  { name: 'Open Air Theatre', building: 'OAT Arena', lat: 30.766200, lng: 76.787500 },
-];
+const PEC_LANDMARKS = KNOWN_VENUES.map((v) => ({
+  name: v.venueName,
+  building: v.building,
+  lat: v.lat,
+  lng: v.lng,
+}));
 
 export function VenueLocationPicker({
   lat,

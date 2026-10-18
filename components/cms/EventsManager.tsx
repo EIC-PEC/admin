@@ -17,9 +17,9 @@ import { ImageDropzone } from '../ui/ImageDropzone';
 import { CmsModal } from './CmsModal';
 import { EventItem, EventInput } from '../../lib/types';
 import { api, ApiError } from '../../lib/api';
+import { CMS_INPUT_CLS } from '../../lib/constants';
 
-const INPUT_CLS =
-  'w-full rounded-xl border border-(--border-panel) bg-(--bg-panel-alt) p-2.5 text-xs text-(--text-primary) focus:border-emerald-500/50 focus:outline-none transition-colors';
+const INPUT_CLS = CMS_INPUT_CLS;
 
 interface Props {
   events: EventItem[];

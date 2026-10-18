@@ -71,7 +71,7 @@ interface CacheItem<T> {
 
 class ApiClient {
   private token: string | null = null;
-  private isRefreshing = false;
+  private refreshPromise: Promise<boolean> | null = null;
   private memoryCache = new Map<string, CacheItem<unknown>>();
 
   constructor() {
@@ -202,27 +202,33 @@ class ApiClient {
   }
 
   async refreshSession(): Promise<boolean> {
-    if (this.isRefreshing) return false;
-    this.isRefreshing = true;
-    try {
-      const res = await fetch(`${API_BASE}/auth/refresh`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.accessToken) {
-          this.setToken(data.accessToken);
-          return true;
-        }
-      }
-    } catch {
-      // Refresh failed
-    } finally {
-      this.isRefreshing = false;
+    if (this.refreshPromise) {
+      return this.refreshPromise;
     }
-    return false;
+
+    this.refreshPromise = (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/auth/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.accessToken) {
+            this.setToken(data.accessToken);
+            return true;
+          }
+        }
+        return false;
+      } catch {
+        return false;
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
   }
 
   async logout(): Promise<void> {
